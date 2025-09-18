@@ -31,7 +31,7 @@ const HeroSection = () => {
               Отримати безкоштовну консультацію
               <ArrowRight className="ml-2" size={20} />
             </a>
-            <a href="tel:+1234567890" className="btn btn-outline text-lg px-8 py-4">
+            <a href="tel:+1234567890" className="btn btn-outline text-lg px-8 py-4 text-white border-white hover:bg-white hover:text-blue-700">
               Телефонуйте (123) 456-7890
             </a>
           </div>
