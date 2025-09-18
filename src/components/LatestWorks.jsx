@@ -33,6 +33,14 @@ const LatestWorks = () => {
       title: "Bathroom Renovation",
       image: "https://images.pexels.com/photos/342800/pexels-photo-342800.jpeg?auto=compress&cs=tinysrgb&w=800",
       description: "Waterproof stretch ceiling with moisture protection"
+    },
+    {
+      id: 6,
+      title: "Restaurant Interior",
+      category: "commercial",
+      image: "https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=800",
+      description: "Fire-resistant ceiling with custom lighting design for dining ambiance",
+      date: "2024-03-01"
     }
   ];
 
