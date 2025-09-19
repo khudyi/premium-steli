@@ -23,7 +23,7 @@ const Footer = () => {
               </a>
             </div>
           </div>
-          
+
           {/* Quick Links */}
           <div>
             <h3 className="font-bold mb-4">Швидкі Посилання</h3>
@@ -55,7 +55,7 @@ const Footer = () => {
               </li>
             </ul>
           </div>
-          
+
           {/* Services */}
           <div>
             <h3 className="font-bold mb-4">Наші послуги</h3>
@@ -67,14 +67,30 @@ const Footer = () => {
               <li className="text-gray-400">Екстрена допомога</li>
             </ul>
           </div>
-          
+
           {/* Contact Info */}
           <div>
             <h3 className="font-bold mb-4">Контактна інформація</h3>
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <Phone size={16} className="text-blue-400" />
-                <span className="text-gray-400">(123) 456-7890</span>
+                <ul>
+                  <li>
+                    <a href="tel:+380979526777" className="text-gray-400">
+                      0 (97) 952 67 77
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tel:+380509526773" className="text-gray-400">
+                      0 (50) 952 67 73
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tel:+380739526773" className="text-gray-400">
+                      0 (73) 952 67 73
+                    </a>
+                  </li>
+                </ul>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail size={16} className="text-blue-400" />
@@ -83,7 +99,7 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400">
             © {new Date().getFullYear()} PremiumSteli. All rights reserved.

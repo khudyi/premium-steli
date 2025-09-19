@@ -28,9 +28,21 @@ const Contacts = () => {
               <p className="text-gray-600 mb-4">
                 Спілкуйтеся безпосередньо з нашими експертами для оперативної допомоги.
               </p>
-              <a href="tel:+1234567890" className="text-blue-600 font-bold text-lg hover:text-blue-800 transition-colors">
-                (123) 456-7890
-              </a>
+              <ul>
+                <li>
+                  <a href="tel:+380979526777" className="text-blue-600 font-bold text-lg hover:text-blue-800 transition-colors">
+                    0 (97) 952 67 77
+                  </a>
+                </li>
+                <li>
+                  <a href="tel:+380509526773" className="text-blue-600 font-bold text-lg hover:text-blue-800 transition-colors">
+                    0 (50) 952 67 73
+                  </a>
+                </li>
+                <li><a href="tel:+380739526773" className="text-blue-600 font-bold text-lg hover:text-blue-800 transition-colors">
+                  0 (73) 952 67 73
+                </a></li>
+              </ul>
               <p className="text-sm text-gray-500 mt-2">Пн-Пт: 08:00-16:00</p>
             </div>
 
@@ -42,8 +54,8 @@ const Contacts = () => {
               <p className="text-gray-600 mb-4">
                 Надішліть нам деталі вашого проєкту, і ми відповімо протягом 24 годин
               </p>
-              <a href="mailto:info@stretchceilingpro.com" className="text-blue-600 font-bold hover:text-blue-800 transition-colors">
-                info@stretchceilingpro.com
+              <a href="mailto:info@premiumsteli.com" className="text-blue-600 font-bold hover:text-blue-800 transition-colors">
+                info@premiumsteli.com
               </a>
               <p className="text-sm text-gray-500 mt-2">Ми відповідаємо цілодобово</p>
             </div>
@@ -106,7 +118,7 @@ const Contacts = () => {
                 </ul>
                 <div className="bg-blue-50 p-4 rounded-lg mt-4">
                   <p className="text-blue-800 font-medium">
-                    Безкоштовна оцінка в межах 50км!
+                    Безкоштовна оцінка в межах 50 км!
                   </p>
                 </div>
               </div>

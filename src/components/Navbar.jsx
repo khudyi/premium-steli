@@ -41,7 +41,7 @@ const Navbar = () => {
               </Link>
             ))}
             <a
-              href="tel:+1234567890"
+              href="tel:+380979526777"
               className="btn btn-primary"
             >
               Зателефонуйте зараз!
@@ -78,7 +78,7 @@ const Navbar = () => {
                 </Link>
               ))}
               <a
-                href="tel:+1234567890"
+                href="tel:+380979526777"
                 className="block w-full text-center mt-4 btn btn-primary"
               >
                 Зателефонуйте зараз!

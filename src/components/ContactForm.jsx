@@ -116,7 +116,7 @@ const ContactForm = () => {
                 </div>
                 <div>
                   <h4 className="font-bold text-gray-900 mb-1">Номер телефону</h4>
-                  <p className="text-gray-600">(123) 456-7890</p>
+                  <p className="text-gray-600">0 (97) 952 67 77</p>
                   <p className="text-sm text-gray-500">Пн-Сб: 08:00-18:00</p>
                 </div>
               </div>
@@ -172,7 +172,7 @@ const ContactForm = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   className="form-input"
-                  placeholder="(123) 456-7890"
+                  placeholder="(123) 456 78 90"
                 />
                 {errors.phone && <div className="form-error">{errors.phone}</div>}
               </div>
