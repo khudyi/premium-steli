@@ -1,48 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Eye } from 'lucide-react';
+import { getProjects } from '../lib/projects'; // імпортуємо функцію з вашого projects.js
 
 const LatestWorks = () => {
-  const projects = [
-    {
-      id: 1,
-      title: "Modern Living Room",
-      image: "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800",
-      description: "Glossy white stretch ceiling with integrated lighting"
-    },
-    {
-      id: 2,
-      title: "Contemporary Kitchen",
-      image: "https://images.pexels.com/photos/2089698/pexels-photo-2089698.jpeg?auto=compress&cs=tinysrgb&w=800",
-      description: "Matte finish ceiling with custom LED integration"
-    },
-    {
-      id: 3,
-      title: "Luxury Bedroom",
-      image: "https://images.pexels.com/photos/1454806/pexels-photo-1454806.jpeg?auto=compress&cs=tinysrgb&w=800",
-      description: "Satin texture ceiling with ambient lighting"
-    },
-    {
-      id: 4,
-      title: "Office Space",
-      image: "https://images.pexels.com/photos/380768/pexels-photo-380768.jpeg?auto=compress&cs=tinysrgb&w=800",
-      description: "Commercial grade ceiling system with perfect acoustics"
-    },
-    {
-      id: 5,
-      title: "Bathroom Renovation",
-      image: "https://images.pexels.com/photos/342800/pexels-photo-342800.jpeg?auto=compress&cs=tinysrgb&w=800",
-      description: "Waterproof stretch ceiling with moisture protection"
-    },
-    {
-      id: 6,
-      title: "Restaurant Interior",
-      category: "commercial",
-      image: "https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=800",
-      description: "Fire-resistant ceiling with custom lighting design for dining ambiance",
-      date: "2024-03-01"
-    }
-  ];
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        const data = await getProjects(); // отримуємо всі проєкти з Supabase
+        // сортуємо за датою (останні спочатку) та беремо 6 найновіших
+        const latest6 = data
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0, 6);
+        setProjects(latest6);
+      } catch (err) {
+        console.error('Помилка при завантаженні проєктів:', err.message);
+      }
+    };
+
+    loadProjects();
+  }, []);
 
   return (
     <section className="section bg-gray-50">
@@ -61,7 +40,7 @@ const LatestWorks = () => {
             <div key={project.id} className="card overflow-hidden group">
               <div className="relative overflow-hidden">
                 <img 
-                  src={project.image} 
+                  src={project.image_url} 
                   alt={project.title}
                   className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
                 />

@@ -1,89 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, Calendar, ArrowLeft } from 'lucide-react';
 import Footer from '../components/Footer';
+import { getProjects } from '../lib/projects';
 
 const Gallery = () => {
   const [projects, setProjects] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedProject, setSelectedProject] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [fade, setFade] = useState(false); // для анімації
+  const projectsPerPage = 9;
 
   useEffect(() => {
-    // Load projects from localStorage or use default projects
-    const savedProjects = JSON.parse(localStorage.getItem('galleryProjects') || '[]');
-    
-    if (savedProjects.length === 0) {
-      // Default projects if none saved
-      const defaultProjects = [
-        {
-          id: 1,
-          title: "Modern Living Room",
-          category: "residential",
-          image: "https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=800",
-          description: "Glossy white stretch ceiling with integrated LED lighting system",
-          date: "2024-01-15"
-        },
-        {
-          id: 2,
-          title: "Contemporary Kitchen",
-          category: "residential",
-          image: "https://images.pexels.com/photos/2089698/pexels-photo-2089698.jpeg?auto=compress&cs=tinysrgb&w=800",
-          description: "Matte finish ceiling with custom LED integration for perfect task lighting",
-          date: "2024-01-20"
-        },
-        {
-          id: 3,
-          title: "Luxury Bedroom",
-          category: "residential",
-          image: "https://images.pexels.com/photos/1454806/pexels-photo-1454806.jpeg?auto=compress&cs=tinysrgb&w=800",
-          description: "Satin texture ceiling with ambient lighting for relaxing atmosphere",
-          date: "2024-02-01"
-        },
-        {
-          id: 4,
-          title: "Office Space",
-          category: "commercial",
-          image: "https://images.pexels.com/photos/380768/pexels-photo-380768.jpeg?auto=compress&cs=tinysrgb&w=800",
-          description: "Commercial grade ceiling system with perfect acoustics and energy efficiency",
-          date: "2024-02-10"
-        },
-        {
-          id: 5,
-          title: "Bathroom Renovation",
-          category: "residential",
-          image: "https://images.pexels.com/photos/342800/pexels-photo-342800.jpeg?auto=compress&cs=tinysrgb&w=800",
-          description: "Waterproof stretch ceiling with moisture protection and integrated ventilation",
-          date: "2024-02-15"
-        },
-        {
-          id: 6,
-          title: "Restaurant Interior",
-          category: "commercial",
-          image: "https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg?auto=compress&cs=tinysrgb&w=800",
-          description: "Fire-resistant ceiling with custom lighting design for dining ambiance",
-          date: "2024-03-01"
-        },
-        {
-          id: 7,
-          title: "Hotel Lobby",
-          category: "commercial",
-          image: "https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=800",
-          description: "Premium stretch ceiling with architectural lighting features",
-          date: "2024-03-10"
-        },
-        {
-          id: 8,
-          title: "Master Suite",
-          category: "residential",
-          image: "https://images.pexels.com/photos/1743227/pexels-photo-1743227.jpeg?auto=compress&cs=tinysrgb&w=800",
-          description: "Multi-level ceiling design with color-changing LED system",
-          date: "2024-03-15"
-        }
-      ];
-      setProjects(defaultProjects);
-      localStorage.setItem('galleryProjects', JSON.stringify(defaultProjects));
-    } else {
-      setProjects(savedProjects);
-    }
+    const loadProjects = async () => {
+      try {
+        const data = await getProjects();
+        const sortedProjects = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setProjects(sortedProjects);
+      } catch (err) {
+        console.error('Помилка при завантаженні проєктів:', err.message);
+      }
+    };
+    loadProjects();
   }, []);
 
   const categories = [
@@ -92,17 +30,26 @@ const Gallery = () => {
     { id: 'commercial', name: 'Комерційні приміщення' }
   ];
 
-  const filteredProjects = selectedCategory === 'all' 
-    ? projects 
+  const filteredProjects = selectedCategory === 'all'
+    ? projects
     : projects.filter(project => project.category === selectedCategory);
 
-  const openProject = (project) => {
-    setSelectedProject(project);
+  // Пагінація
+  const indexOfLastProject = currentPage * projectsPerPage;
+  const indexOfFirstProject = indexOfLastProject - projectsPerPage;
+  const currentProjects = filteredProjects.slice(indexOfFirstProject, indexOfLastProject);
+  const totalPages = Math.ceil(filteredProjects.length / projectsPerPage);
+
+  const goToPage = (pageNumber) => {
+    setFade(true);
+    setTimeout(() => {
+      setCurrentPage(pageNumber);
+      setFade(false);
+    }, 200); // час анімації
   };
 
-  const closeProject = () => {
-    setSelectedProject(null);
-  };
+  const openProject = (project) => setSelectedProject(project);
+  const closeProject = () => setSelectedProject(null);
 
   return (
     <div>
@@ -126,7 +73,7 @@ const Gallery = () => {
               {categories.map((category) => (
                 <button
                   key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
+                  onClick={() => { setSelectedCategory(category.id); setCurrentPage(1); }}
                   className={`px-6 py-3 rounded-md font-medium transition-colors ${
                     selectedCategory === category.id
                       ? 'bg-blue-600 text-white'
@@ -140,12 +87,18 @@ const Gallery = () => {
           </div>
 
           {/* Projects Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProjects.map((project) => (
-              <div key={project.id} className="card overflow-hidden group cursor-pointer" onClick={() => openProject(project)}>
+          <div
+            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-opacity duration-300 ${fade ? 'opacity-0' : 'opacity-100'}`}
+          >
+            {currentProjects.map((project) => (
+              <div
+                key={project.id}
+                className="card overflow-hidden group cursor-pointer"
+                onClick={() => openProject(project)}
+              >
                 <div className="relative overflow-hidden">
-                  <img 
-                    src={project.image} 
+                  <img
+                    src={project.image_url}
                     alt={project.title}
                     className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
                   />
@@ -178,6 +131,37 @@ const Gallery = () => {
               </div>
             ))}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-12 space-x-2">
+              <button
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50 hover:bg-gray-300 transition-colors"
+              >
+                Попередня
+              </button>
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => goToPage(i + 1)}
+                  className={`px-4 py-2 rounded-md transition-colors ${
+                    currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50 hover:bg-gray-300 transition-colors"
+              >
+                Наступна
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -186,8 +170,8 @@ const Gallery = () => {
         <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-4xl max-h-full overflow-auto">
             <div className="relative">
-              <img 
-                src={selectedProject.image} 
+              <img
+                src={selectedProject.image_url}
                 alt={selectedProject.title}
                 className="w-full h-96 object-cover"
               />
