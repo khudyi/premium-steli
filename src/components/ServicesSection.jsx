@@ -1,4 +1,3 @@
-import React from 'react';
 import { Check, Home, Building2, Wrench } from 'lucide-react';
 
 const ServicesSection = () => {

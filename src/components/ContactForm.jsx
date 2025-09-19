@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Phone, Mail, MapPin, Send } from 'lucide-react';
-import { addSubmission } from '../lib/submissions'; // Імпорт функції для Supabase
+import { addSubmission } from '../lib/submissions';
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -17,7 +17,6 @@ const ContactForm = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
 
-    // Зняти помилку при введенні
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -54,7 +53,7 @@ const ContactForm = () => {
     setIsSubmitting(true);
 
     try {
-      await addSubmission(formData); // Надсилання до Supabase
+      await addSubmission(formData);
       setSubmitted(true);
       setFormData({ name: '', phone: '', email: '', projectDetails: '' });
     } catch (err) {

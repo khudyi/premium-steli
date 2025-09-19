@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Eye } from 'lucide-react';
-import { getProjects } from '../lib/projects'; // імпортуємо функцію з вашого projects.js
+import { getProjects } from '../lib/projects';
 
 const LatestWorks = () => {
   const [projects, setProjects] = useState([]);
@@ -10,7 +10,6 @@ const LatestWorks = () => {
     const loadProjects = async () => {
       try {
         const data = await getProjects(); // отримуємо всі проєкти з Supabase
-        // сортуємо за датою (останні спочатку) та беремо 6 найновіших
         const latest6 = data
           .sort((a, b) => new Date(b.date) - new Date(a.date))
           .slice(0, 6);
