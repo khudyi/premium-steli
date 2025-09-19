@@ -1,4 +1,3 @@
-import React from 'react';
 import HeroSection from '../components/HeroSection';
 import LatestWorks from '../components/LatestWorks';
 import ServicesSection from '../components/ServicesSection';

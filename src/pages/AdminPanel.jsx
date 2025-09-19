@@ -299,8 +299,6 @@ const Card = ({ title, value, icon }) => (
   </div>
 );
 
-// --- GalleryTab, SubmissionsTab і ChangePasswordTab залишаються такими ж, тільки передається showNotification і замість alert() викликається showNotification ---
-
 // --- GalleryTab ---
 export const GalleryTab = ({ projects, editingProject, setEditingProject, handleSaveProject, handleDeleteProjectClick, showNotification }) => (
   <div>
@@ -515,7 +513,7 @@ export const SubmissionsTab = ({ submissions, handleDeleteSubmissionClick, showN
 );
 
 // --- ChangePasswordTab ---
-export const ChangePasswordTab = ({ session, showNotification }) => {
+export const ChangePasswordTab = ({showNotification }) => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
