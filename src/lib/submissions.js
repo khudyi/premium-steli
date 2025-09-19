@@ -10,6 +10,22 @@ export const getSubmissions = async () => {
   return data;
 };
 
+// Додати нову заявку
+export const addSubmission = async (submission) => {
+  const { data, error } = await supabase
+    .from('submissions')
+    .insert([{
+      name: submission.name,
+      phone: submission.phone,
+      email: submission.email,
+      project_details: submission.projectDetails,
+      timestamp: new Date().toISOString()
+    }]);
+    
+  if (error) throw error;
+  return data;
+};
+
 // Видалити заявку
 export const deleteSubmission = async (id) => {
   const { data, error } = await supabase

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Lock, Eye, Trash2, Plus, BarChart3, Users, Mail, Calendar } from 'lucide-react';
+import { Lock, Eye, Trash2, Plus, BarChart3, Mail, Calendar } from 'lucide-react';
 import { getProjects, addProject, updateProject, deleteProject } from '../lib/projects';
 import { getSubmissions, deleteSubmission } from '../lib/submissions';
 import { uploadImage } from '../lib/storage';

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Phone, Mail, MapPin, Send } from 'lucide-react';
+import { addSubmission } from '../lib/submissions'; // Імпорт функції для Supabase
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -14,77 +15,53 @@ const ContactForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    // Clear error when user starts typing
+    setFormData(prev => ({ ...prev, [name]: value }));
+
+    // Зняти помилку при введенні
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.name.trim()) {
-      newErrors.name = 'Ім’я обов’язкове';
-    }
-    
+    if (!formData.name.trim()) newErrors.name = 'Ім’я обов’язкове';
     if (!formData.phone.trim()) {
       newErrors.phone = 'Номер телефону обов’язковий';
     } else if (!/^\+?[\d\s-()]+$/.test(formData.phone)) {
       newErrors.phone = 'Будь ласка, введіть дійсний номер телефону';
     }
-    
     if (!formData.email.trim()) {
       newErrors.email = 'Електронна пошта обов’язкова';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Будь ласка, введіть дійсну електронну адресу';
     }
-    
-    if (!formData.projectDetails.trim()) {
-      newErrors.projectDetails = 'Деталі проєкту обов’язкові';
-    }
-    
+    if (!formData.projectDetails.trim()) newErrors.projectDetails = 'Деталі проєкту обов’язкові';
+
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-    
+
     setIsSubmitting(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
-      // Save to localStorage (in real app, send to server)
-      const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
-      const newSubmission = {
-        ...formData,
-        id: Date.now(),
-        timestamp: new Date().toISOString()
-      };
-      submissions.push(newSubmission);
-      localStorage.setItem('contactSubmissions', JSON.stringify(submissions));
-      
+
+    try {
+      await addSubmission(formData); // Надсилання до Supabase
       setSubmitted(true);
+      setFormData({ name: '', phone: '', email: '', projectDetails: '' });
+    } catch (err) {
+      alert('Сталася помилка при надсиланні заявки: ' + err.message);
+    } finally {
       setIsSubmitting(false);
-      setFormData({
-        name: '',
-        phone: '',
-        email: '',
-        projectDetails: ''
-      });
-    }, 1500);
+    }
   };
 
   if (submitted) {
@@ -100,7 +77,7 @@ const ContactForm = () => {
                 Дякуємо за ваш інтерес!
               </h3>
               <p className="text-green-700 mb-4">
-                Ми отримали деталі вашого проєкту і зв’яжемося з вами протягом 24 годин, щоб домовитися про безкоштовну консультацію.
+                Ми отримали деталі вашого проєкту і зв’яжемося з вами протягом 24 годин.
               </p>
               <button 
                 onClick={() => setSubmitted(false)}
@@ -123,17 +100,16 @@ const ContactForm = () => {
             Отримайте безкоштовну консультацію
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Готові перетворити свій простір? Зв’яжіться з нами для безкоштовної консультації та персоналізованої пропозиції для вашого проєкту натяжної стелі.
+            Готові перетворити свій простір? Зв’яжіться з нами для безкоштовної консультації.
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
           {/* Contact Info */}
           <div>
             <h3 className="text-2xl font-bold text-gray-900 mb-6">
               Зв’яжіться з нами
             </h3>
-            
             <div className="space-y-6">
               <div className="flex items-start space-x-4">
                 <div className="bg-blue-100 p-3 rounded-lg">
@@ -164,29 +140,18 @@ const ContactForm = () => {
                 <div>
                   <h4 className="font-bold text-gray-900 mb-1">Територія обслуговування</h4>
                   <p className="text-gray-600">Вінниця та область</p>
-                  <p className="text-sm text-gray-500">Безкоштовна оцінка в межах 50 км</p>
                 </div>
               </div>
             </div>
-            
-            <div className="mt-8 p-6 bg-blue-600 text-white rounded-lg">
-              <h4 className="font-bold text-lg mb-2">Доступна екстрена допомога</h4>
-              <p className="text-blue-100 mb-4">
-                Потрібен терміновий ремонт стелі? Ми надаємо екстрене реагування 24/7 при пошкодженні водою та термінових ремонтах
-              </p>
-              <a href="tel:+1234567890" className="btn btn-accent">
-                Зателефонуйте на аварійну лінію
-              </a>
-            </div>
           </div>
-          
+
           {/* Contact Form */}
           <div>
             <form onSubmit={handleSubmit} className="card p-8">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">
                 Отримати безкоштовну консультацію
               </h3>
-              
+
               <div className="form-group">
                 <label className="form-label">Повне імʼя *</label>
                 <input
@@ -199,7 +164,7 @@ const ContactForm = () => {
                 />
                 {errors.name && <div className="form-error">{errors.name}</div>}
               </div>
-              
+
               <div className="form-group">
                 <label className="form-label">Номер телефону *</label>
                 <input
@@ -212,7 +177,7 @@ const ContactForm = () => {
                 />
                 {errors.phone && <div className="form-error">{errors.phone}</div>}
               </div>
-              
+
               <div className="form-group">
                 <label className="form-label">Електронна адреса *</label>
                 <input
@@ -225,7 +190,7 @@ const ContactForm = () => {
                 />
                 {errors.email && <div className="form-error">{errors.email}</div>}
               </div>
-              
+
               <div className="form-group">
                 <label className="form-label">Деталі проєкту *</label>
                 <textarea
@@ -234,11 +199,11 @@ const ContactForm = () => {
                   onChange={handleChange}
                   rows="4"
                   className="form-input"
-                  placeholder="Розкажіть нам про свій проєкт: розмір кімнати, тип стелі, бажаний стиль, терміни тощо"
+                  placeholder="Розкажіть нам про свій проєкт"
                 />
                 {errors.projectDetails && <div className="form-error">{errors.projectDetails}</div>}
               </div>
-              
+
               <button 
                 type="submit" 
                 disabled={isSubmitting}
@@ -247,9 +212,9 @@ const ContactForm = () => {
                 {isSubmitting ? 'Надсилаємо…' : 'Отримати безкоштовну консультацію'}
                 {!isSubmitting && <Send className="ml-2" size={18} />}
               </button>
-              
+
               <p className="text-sm text-gray-500 mt-4 text-center">
-                Надсилаючи цю форму, ви погоджуєтеся отримувати від нас повідомлення. Ваші дані захищені і не будуть передані третім особам
+                Надсилаючи цю форму, ви погоджуєтеся отримувати від нас повідомлення. Ваші дані захищені.
               </p>
             </form>
           </div>
