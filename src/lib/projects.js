@@ -19,7 +19,8 @@ export const addProject = async (project) => {
       category: project.category,
       description: project.description,
       date: project.date,
-      image_url: project.image_url // <--- обов’язково!
+      image_url: project.image_url, // головне фото
+      images: project.images || [] // масив фото
     }]);
   if (error) throw error;
   return data;
@@ -34,7 +35,8 @@ export const updateProject = async (id, project) => {
       category: project.category,
       description: project.description,
       date: project.date,
-      image_url: project.image_url
+      image_url: project.image_url,
+      images: project.images || []
     })
     .eq('id', id);
   if (error) throw error;

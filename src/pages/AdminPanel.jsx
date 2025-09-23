@@ -4,6 +4,7 @@ import { Lock, Eye, Trash2, Plus, BarChart3, Mail, Calendar } from 'lucide-react
 import { getProjects, addProject, updateProject, deleteProject } from '../lib/projects';
 import { getSubmissions, deleteSubmission } from '../lib/submissions';
 import { uploadImage } from '../lib/storage';
+import { GalleryTab } from '../components/GalleryTab';
 
 const AdminPanel = () => {
   const [session, setSession] = useState(null);
@@ -240,14 +241,7 @@ const AdminPanel = () => {
             )}
 
             {activeTab === 'gallery' && (
-              <GalleryTab
-                projects={projects}
-                editingProject={editingProject}
-                setEditingProject={setEditingProject}
-                handleSaveProject={handleSaveProject}
-                handleDeleteProjectClick={handleDeleteProjectClick}
-                showNotification={showNotification}
-              />
+              <GalleryTab showNotification={showNotification} />
             )}
 
             {activeTab === 'submissions' && (
@@ -259,7 +253,7 @@ const AdminPanel = () => {
             )}
 
             {activeTab === 'changePassword' && (
-              <ChangePasswordTab session={session} showNotification={showNotification} />
+              <ChangePasswordTab showNotification={showNotification} />
             )}
           </div>
         </div>
@@ -295,164 +289,6 @@ const Card = ({ title, value, icon }) => (
         <p className="text-3xl font-bold text-blue-600">{value}</p>
       </div>
       {icon}
-    </div>
-  </div>
-);
-
-// --- GalleryTab ---
-export const GalleryTab = ({ projects, editingProject, setEditingProject, handleSaveProject, handleDeleteProjectClick, showNotification }) => (
-  <div>
-    <div className="flex justify-between items-center mb-6">
-      <h2 className="text-2xl font-bold text-gray-900">Управління галереєю</h2>
-      <button
-        onClick={() =>
-          setEditingProject({
-            title: '',
-            category: 'residential',
-            image_url: '',
-            description: '',
-            date: new Date().toISOString().split('T')[0],
-          })
-        }
-        className="btn btn-primary"
-      >
-        <Plus className="mr-2" size={20} /> Додати проєкт
-      </button>
-    </div>
-
-    {editingProject && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-3xl overflow-y-auto max-h-[90vh]">
-          <h3 className="text-xl font-bold text-gray-900 mb-4">
-            {editingProject.id ? 'Редагувати проєкт' : 'Додати новий проєкт'}
-          </h3>
-          <form onSubmit={handleSaveProject}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="form-group">
-                <label className="form-label">Заголовок</label>
-                <input
-                  type="text"
-                  value={editingProject.title}
-                  onChange={(e) =>
-                    setEditingProject({ ...editingProject, title: e.target.value })
-                  }
-                  className="form-input"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Категорія</label>
-                <select
-                  value={editingProject.category}
-                  onChange={(e) =>
-                    setEditingProject({ ...editingProject, category: e.target.value })
-                  }
-                  className="form-input"
-                >
-                  <option value="residential">Житлова зона</option>
-                  <option value="commercial">Комерційна нерухомість</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Фото</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="form-input"
-                  onChange={async (e) => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      try {
-                        const url = await uploadImage(file);
-                        setEditingProject({ ...editingProject, image_url: url });
-                        showNotification('Зображення завантажено!', 'success');
-                      } catch (err) {
-                        showNotification('Помилка при завантаженні зображення: ' + err.message, 'error');
-                      }
-                    }
-                  }}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Дата</label>
-                <input
-                  type="date"
-                  value={editingProject.date}
-                  onChange={(e) =>
-                    setEditingProject({ ...editingProject, date: e.target.value })
-                  }
-                  className="form-input"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-group mt-4">
-              <label className="form-label">Опис</label>
-              <textarea
-                value={editingProject.description}
-                onChange={(e) =>
-                  setEditingProject({ ...editingProject, description: e.target.value })
-                }
-                className="form-input"
-                rows="3"
-                required
-              />
-            </div>
-
-            <div className="flex space-x-4 mt-4">
-              <button type="submit" className="btn btn-primary">
-                {editingProject.id ? 'Оновити' : 'Додати'} Проєкт
-              </button>
-              <button
-                type="button"
-                onClick={() => setEditingProject(null)}
-                className="btn btn-outline"
-              >
-                Скасувати
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    )}
-
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {projects.map((project) => (
-        <div key={project.id} className="card overflow-hidden">
-          <img
-            src={project.image_url}
-            alt={project.title}
-            className="w-full h-48 object-cover"
-          />
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-bold">{project.title}</h3>
-              <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full capitalize">
-                {project.category}
-              </span>
-            </div>
-            <p className="text-gray-600 text-sm mb-4">{project.description}</p>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => setEditingProject(project)}
-                className="btn btn-outline text-sm px-3 py-1"
-              >
-                Редагувати
-              </button>
-              <button
-                onClick={() => handleDeleteProjectClick(project.id)}
-                className="btn bg-red-600 text-white hover:bg-red-700 text-sm px-3 py-1"
-              >
-                <Trash2 size={14} />
-              </button>
-            </div>
-          </div>
-        </div>
-      ))}
     </div>
   </div>
 );
@@ -513,7 +349,7 @@ export const SubmissionsTab = ({ submissions, handleDeleteSubmissionClick, showN
 );
 
 // --- ChangePasswordTab ---
-export const ChangePasswordTab = ({showNotification }) => {
+export const ChangePasswordTab = ({ showNotification }) => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
