@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Eye, Calendar, ArrowLeft } from 'lucide-react';
+import { Eye, Calendar, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import Footer from '../components/Footer';
 import { getProjects } from '../lib/projects';
 
@@ -7,8 +7,10 @@ const Gallery = () => {
   const [projects, setProjects] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedProject, setSelectedProject] = useState(null);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [fade, setFade] = useState(false); // для анімації
+  const [fade, setFade] = useState(false);
+  const [slideFade, setSlideFade] = useState(false);
   const projectsPerPage = 9;
 
   useEffect(() => {
@@ -24,17 +26,26 @@ const Gallery = () => {
     loadProjects();
   }, []);
 
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') closeProject();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, []);
+
   const categories = [
     { id: 'all', name: 'Усі проєкти' },
-    { id: 'residential', name: 'Житлові приміщення' },
-    { id: 'commercial', name: 'Комерційні приміщення' }
+    { id: 'Житлові', name: 'Житлові приміщення' },
+    { id: 'Комерційні', name: 'Комерційні приміщення' },
+    { id: 'Громадські', name: 'Громадські приміщення' },
+    { id: 'Інше', name: 'Інше' },
   ];
 
   const filteredProjects = selectedCategory === 'all'
     ? projects
     : projects.filter(project => project.category === selectedCategory);
 
-  // Пагінація
   const indexOfLastProject = currentPage * projectsPerPage;
   const indexOfFirstProject = indexOfLastProject - projectsPerPage;
   const currentProjects = filteredProjects.slice(indexOfFirstProject, indexOfLastProject);
@@ -45,88 +56,105 @@ const Gallery = () => {
     setTimeout(() => {
       setCurrentPage(pageNumber);
       setFade(false);
-    }, 200); // час анімації
+    }, 200);
   };
 
-  const openProject = (project) => setSelectedProject(project);
-  const closeProject = () => setSelectedProject(null);
+  const openProject = (project) => {
+    setSelectedProject(project);
+    setCurrentPhotoIndex(0);
+  };
+
+  const closeProject = () => {
+    setSelectedProject(null);
+    setCurrentPhotoIndex(0);
+  };
+
+  const photos = selectedProject
+    ? [selectedProject.image_url, ...(selectedProject.images || [])]
+    : [];
+
+  const prevPhoto = () => {
+    setSlideFade(true);
+    setTimeout(() => {
+      setCurrentPhotoIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
+      setSlideFade(false);
+    }, 200);
+  };
+
+  const nextPhoto = () => {
+    setSlideFade(true);
+    setTimeout(() => {
+      setCurrentPhotoIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
+      setSlideFade(false);
+    }, 200);
+  };
 
   return (
     <div>
+      {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-blue-900 to-blue-800 text-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-5xl font-bold mb-6">Наша галерея</h1>
-            <p className="text-xl text-blue-100">
-              Ознайомтеся з нашим портфоліо вражаючих встановлень натяжних стель.
-              Кожен проєкт демонструє нашу відданість якості та інноваціям.
-            </p>
-          </div>
+        <div className="container mx-auto px-4 text-center max-w-3xl mx-auto">
+          <h1 className="text-5xl font-bold mb-6">Наша галерея</h1>
+          <p className="text-xl text-blue-100">
+            Ознайомтеся з нашим портфоліо вражаючих встановлень натяжних стель.
+            Кожен проєкт демонструє нашу відданість якості та інноваціям.
+          </p>
         </div>
       </section>
 
+      {/* Category Filter */}
       <section className="section">
         <div className="container mx-auto px-4">
-          {/* Category Filter */}
-          <div className="flex justify-center mb-12">
-            <div className="flex space-x-4 bg-gray-100 p-2 rounded-lg">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => { setSelectedCategory(category.id); setCurrentPage(1); }}
-                  className={`px-6 py-3 rounded-md font-medium transition-colors ${
-                    selectedCategory === category.id
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-600 hover:text-blue-600'
-                  }`}
-                >
-                  {category.name}
-                </button>
-              ))}
-            </div>
+          <div className="flex justify-center mb-12 flex-wrap gap-2 bg-gray-100 p-2 rounded-lg">
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => { setSelectedCategory(category.id); setCurrentPage(1); }}
+                className={`px-6 py-2 rounded-md font-medium transition-colors ${
+                  selectedCategory === category.id
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-600 hover:text-blue-600 hover:bg-gray-200'
+                }`}
+              >
+                {category.name}
+              </button>
+            ))}
           </div>
 
           {/* Projects Grid */}
-          <div
-            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-opacity duration-300 ${fade ? 'opacity-0' : 'opacity-100'}`}
-          >
+          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-opacity duration-300 ${fade ? 'opacity-0' : 'opacity-100'}`}>
             {currentProjects.map((project) => (
               <div
                 key={project.id}
-                className="card overflow-hidden group cursor-pointer"
+                className="bg-white shadow-md rounded-lg overflow-hidden cursor-pointer group hover:shadow-xl transition-shadow"
                 onClick={() => openProject(project)}
               >
                 <div className="relative overflow-hidden">
                   <img
                     src={project.image_url}
                     alt={project.title}
-                    className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <div className="flex items-center justify-center">
-                        <Eye className="text-white" size={24} />
-                        <span className="text-white ml-2 font-medium">Переглянути деталі</span>
-                      </div>
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <div className="flex items-center text-white gap-2 font-medium">
+                      <Eye size={20} /> Переглянути деталі
                     </div>
                   </div>
                 </div>
                 <div className="p-6">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Calendar size={16} className="text-gray-400" />
-                    <span className="text-sm text-gray-500">
-                      {new Date(project.date).toLocaleDateString()}
-                    </span>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <Calendar size={16} className="text-gray-400" />
+                      <span className="text-sm text-gray-500">
+                        {new Date(project.date).toLocaleDateString()}
+                      </span>
+                    </div>
                     <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full capitalize">
                       {project.category}
                     </span>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    {project.title}
-                  </h3>
-                  <p className="text-gray-600">
-                    {project.description}
-                  </p>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
+                  <p className="text-gray-600 text-sm">{project.description}</p>
                 </div>
               </div>
             ))}
@@ -134,7 +162,7 @@ const Gallery = () => {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center mt-12 space-x-2">
+            <div className="flex justify-center mt-12 space-x-2 flex-wrap">
               <button
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 1}
@@ -165,39 +193,94 @@ const Gallery = () => {
         </div>
       </section>
 
-      {/* Project Modal */}
+      {/* Project Modal with Carousel */}
       {selectedProject && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-4xl max-h-full overflow-auto">
-            <div className="relative">
-              <img
-                src={selectedProject.image_url}
-                alt={selectedProject.title}
-                className="w-full h-96 object-cover"
-              />
-              <button
-                onClick={closeProject}
-                className="absolute top-4 left-4 bg-white bg-opacity-90 p-2 rounded-full hover:bg-opacity-100 transition-colors"
-              >
-                <ArrowLeft size={24} />
-              </button>
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={closeProject} // клік по бекдропу закриває модалку
+        >
+          <div
+            className="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-full overflow-auto relative"
+            onClick={(e) => e.stopPropagation()} // блокування закриття при кліку всередині модалки
+          >
+            {/* Close Button */}
+            <button
+              onClick={closeProject}
+              className="absolute top-3 right-3 z-50 bg-black/60 hover:bg-black/80 text-white p-2 rounded-full transition-colors"
+              aria-label="Закрити модалку"
+            >
+              <X size={24} />
+            </button>
+
+            {/* Carousel */}
+            <div className="relative w-full">
+              {photos.length > 0 && (
+                <>
+                  <img
+                    key={currentPhotoIndex} // ключ для анімації
+                    src={photos[currentPhotoIndex]}
+                    alt={`Фото ${currentPhotoIndex + 1}`}
+                    className={`w-full h-96 object-cover rounded-t-lg transition-opacity duration-300 ${
+                      slideFade ? 'opacity-0' : 'opacity-100'
+                    }`}
+                  />
+                  {photos.length > 1 && (
+                    <>
+                      <button
+                        onClick={prevPhoto}
+                        className="absolute top-1/2 left-2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full hover:bg-black/50 transition-colors"
+                      >
+                        <ChevronLeft size={24} />
+                      </button>
+                      <button
+                        onClick={nextPhoto}
+                        className="absolute top-1/2 right-2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full hover:bg-black/50 transition-colors"
+                      >
+                        <ChevronRight size={24} />
+                      </button>
+                    </>
+                  )}
+
+                  {/* Photo Indicator */}
+                  <div className="absolute bottom-2 right-2 bg-black/50 text-white text-sm px-3 py-1 rounded-full">
+                    {currentPhotoIndex + 1} / {photos.length}
+                  </div>
+                </>
+              )}
             </div>
-            <div className="p-8">
-              <div className="flex items-center space-x-2 mb-4">
-                <Calendar size={16} className="text-gray-400" />
-                <span className="text-sm text-gray-500">
-                  {new Date(selectedProject.date).toLocaleDateString()}
-                </span>
+
+            {/* Project Info */}
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <Calendar size={16} className="text-gray-400" />
+                  <span className="text-sm text-gray-500">
+                    {new Date(selectedProject.date).toLocaleDateString()}
+                  </span>
+                </div>
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full capitalize">
                   {selectedProject.category}
                 </span>
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                {selectedProject.title}
-              </h2>
-              <p className="text-gray-600 text-lg">
-                {selectedProject.description}
-              </p>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">{selectedProject.title}</h2>
+              <p className="text-gray-600 text-lg">{selectedProject.description}</p>
+
+              {/* Thumbnails */}
+              {photos.length > 1 && (
+                <div className="flex justify-center items-center gap-2 p-4 overflow-x-auto">
+                  {photos.map((photo, idx) => (
+                    <img
+                      key={idx}
+                      src={photo}
+                      alt={`Прев'ю ${idx + 1}`}
+                      onClick={() => setCurrentPhotoIndex(idx)}
+                      className={`w-20 h-20 object-cover rounded cursor-pointer border-2 ${
+                        idx === currentPhotoIndex ? 'border-blue-600' : 'border-transparent'
+                      } hover:opacity-80 transition-opacity`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
