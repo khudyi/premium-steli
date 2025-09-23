@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getProjects, addProject, updateProject, deleteProject } from '../lib/projects';
 import { uploadImage } from '../lib/storage';
-import { Trash2, Plus, X } from 'lucide-react';
+import { Trash2, Plus, X, Calendar } from 'lucide-react';
 
 export const GalleryTab = ({ showNotification }) => {
   const [projects, setProjects] = useState([]);
@@ -75,18 +75,28 @@ export const GalleryTab = ({ showNotification }) => {
       {/* Список проєктів */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((project) => (
-          <div key={project.id} className="card p-4 shadow-md rounded-lg">
-            <img
-              src={project.image_url}
-              alt={project.title}
-              className="w-full h-48 object-cover rounded-md"
-            />
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold">{project.title}</h3>
-              <p className="text-sm text-gray-500">{project.category}</p>
-              <p className="text-gray-600 text-sm">{project.description}</p>
+          <div
+            key={project.id}
+            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow cursor-pointer group"
+          >
+            <div className="relative">
+              <img
+                src={project.image_url}
+                alt={project.title}
+                className="w-full h-52 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute top-3 left-3 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                {project.category}
+              </div>
+              <div className="absolute top-3 right-3 bg-white/70 px-2 py-1 rounded text-gray-700 text-xs flex items-center gap-1">
+                <Calendar size={12} /> {new Date(project.date).toLocaleDateString()}
+              </div>
             </div>
-            <div className="flex justify-end gap-2 mt-4">
+            <div className="p-4">
+              <h3 className="text-lg font-semibold mb-1">{project.title}</h3>
+              <p className="text-gray-600 text-sm line-clamp-3">{project.description}</p>
+            </div>
+            <div className="flex justify-end gap-2 p-4 pt-0">
               <button
                 onClick={() => setEditingProject(project)}
                 className="px-3 py-1 text-sm rounded bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
@@ -106,8 +116,8 @@ export const GalleryTab = ({ showNotification }) => {
 
       {/* Модальне вікно */}
       {editingProject && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-auto">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6 relative">
             <button
               onClick={() => setEditingProject(null)}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
@@ -172,7 +182,7 @@ export const GalleryTab = ({ showNotification }) => {
 
               {/* Головне фото */}
               <div>
-                <label className="form-label">Головне фото (превʼю)</label>
+                <label className="form-label">Головне фото</label>
                 <input
                   type="file"
                   accept="image/*"
@@ -189,18 +199,11 @@ export const GalleryTab = ({ showNotification }) => {
                     }
                   }}
                 />
-                {editingProject.image_url && (
-                  <img
-                    src={editingProject.image_url}
-                    alt="preview"
-                    className="mt-2 w-32 h-32 object-cover rounded-md"
-                  />
-                )}
               </div>
 
               {/* Додаткові фото */}
               <div>
-                <label className="form-label">Додаткові фото (галерея)</label>
+                <label className="form-label">Додаткові фото</label>
                 <input
                   type="file"
                   accept="image/*"
@@ -225,26 +228,6 @@ export const GalleryTab = ({ showNotification }) => {
                     }
                   }}
                 />
-
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {(editingProject.images || []).map((img, i) => (
-                    <div key={i} className="relative">
-                      <img src={img} alt="" className="w-20 h-20 object-cover rounded" />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setEditingProject({
-                            ...editingProject,
-                            images: editingProject.images.filter((_, idx) => idx !== i),
-                          })
-                        }
-                        className="absolute top-0 right-0 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
               </div>
 
               <div className="flex justify-end gap-3">

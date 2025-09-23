@@ -103,12 +103,12 @@ const LatestWorks = () => {
               <div className="p-6">
                 {/* Категорія та дата */}
                 <div className="flex justify-between items-center mb-2">
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full capitalize">
-                    {project.category}
-                  </span>
                   <div className="flex items-center text-gray-500 text-sm gap-1">
                     <Calendar size={14} /> {new Date(project.date).toLocaleDateString()}
                   </div>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full capitalize">
+                    {project.category}
+                  </span>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
                 <p className="text-gray-600 text-sm">{project.description}</p>
