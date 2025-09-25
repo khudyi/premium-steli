@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Homepage from './pages/Homepage';
 import Gallery from './pages/Gallery';
@@ -36,6 +37,13 @@ function AnimatedRoutes() {
 }
 
 function App() {
+  useEffect(() => {
+    console.log(
+      `%c💛 Made with love by Ihor Khudyi 💛`,
+      'color: #facc15; font-size: 20px; font-weight: bold; text-shadow: 2px 2px #1e40af;'
+    );
+  }, []);
+
   return (
     <Router>
       <ScrollToTop />
