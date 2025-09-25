@@ -5,6 +5,7 @@ import Homepage from './pages/Homepage';
 import Gallery from './pages/Gallery';
 import Contacts from './pages/Contacts';
 import AdminPanel from './pages/AdminPanel';
+import ScrollToTop from './components/ScrollToTop';
 import './App.css';
 
 function PageWrapper({ children }) {
@@ -37,6 +38,7 @@ function AnimatedRoutes() {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <div className="App">
         <Navbar />
         <AnimatedRoutes />
