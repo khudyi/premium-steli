@@ -172,7 +172,7 @@ const ContactForm = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   className="form-input"
-                  placeholder="(123) 456 78 90"
+                  placeholder="+380..."
                 />
                 {errors.phone && <div className="form-error">{errors.phone}</div>}
               </div>
