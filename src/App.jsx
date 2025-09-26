@@ -40,7 +40,7 @@ function App() {
   useEffect(() => {
     console.log(
       `%c💛 Made with love by Ihor Khudyi 💛`,
-      'color: #facc15; font-size: 20px; font-weight: bold; text-shadow: 2px 2px #1e40af;'
+      'color: #facc15; font-size: 16px; font-weight: bold; text-shadow: 2px 2px #1e40af;'
     );
   }, []);
 
