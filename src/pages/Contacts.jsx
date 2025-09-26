@@ -121,7 +121,6 @@ const Contacts = () => {
       </section>
 
       <ContactForm />
-      <Footer />
     </div>
   );
 };

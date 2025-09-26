@@ -1,7 +1,8 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect } from 'react';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Homepage from './pages/Homepage';
 import Gallery from './pages/Gallery';
 import Contacts from './pages/Contacts';
@@ -21,9 +22,8 @@ function PageWrapper({ children }) {
     </motion.div>
   );
 }
-function AnimatedRoutes() {
-  const location = useLocation();
 
+function AnimatedRoutes({ location }) {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
@@ -47,12 +47,22 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <div className="App">
+      <div className="app-container min-h-screen flex flex-col">
         <Navbar />
-        <AnimatedRoutes />
+        <main className="flex-1">
+          <AnimatedRoutesWrapper />
+        </main>
+        <Footer />
       </div>
     </Router>
   );
+}
+
+// Окремий компонент для отримання location для AnimateRoutes
+import { useLocation, Routes, Route } from 'react-router-dom';
+function AnimatedRoutesWrapper() {
+  const location = useLocation();
+  return <AnimatedRoutes location={location} />;
 }
 
 export default App;

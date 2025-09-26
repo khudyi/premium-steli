@@ -308,8 +308,6 @@ const Gallery = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <Footer />
     </div>
   );
 };
