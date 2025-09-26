@@ -100,8 +100,8 @@ const LatestWorks = () => {
                 onClick={() => openProject(project)}
               >
                 <div className="relative overflow-hidden">
-                  <img 
-                    src={project.image_url} 
+                  <img
+                    src={project.image_url}
                     alt={project.title}
                     className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
                   />
@@ -128,12 +128,26 @@ const LatestWorks = () => {
           ))}
         </div>
 
-        <div className="text-center">
-          <Link to="/gallery" className="btn btn-primary inline-flex items-center text-lg">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6">
+          <Link
+            to="/gallery"
+            className="btn btn-primary inline-flex items-center text-lg"
+          >
             Переглянути всі проєкти
             <ArrowRight className="ml-2" size={20} />
           </Link>
+
+          <a
+            href="https://www.instagram.com/premiumsteli/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-outline inline-flex items-center text-lg"
+          >
+            Instagram
+            <ArrowRight className="ml-2" size={20} />
+          </a>
         </div>
+
       </div>
 
       {selectedProject && (
