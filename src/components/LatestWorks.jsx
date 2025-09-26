@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Eye, X, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { getProjects } from '../lib/projects';
+import { motion } from 'framer-motion';
 
 const LatestWorks = () => {
   const [projects, setProjects] = useState([]);
@@ -32,14 +33,8 @@ const LatestWorks = () => {
     return () => window.removeEventListener('keydown', handleEsc);
   }, []);
 
-  // Блокуємо скрол фонового контенту при відкритті модалки
   useEffect(() => {
-    if (selectedProject) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-
+    document.body.style.overflow = selectedProject ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
     };
@@ -71,6 +66,16 @@ const LatestWorks = () => {
     setCurrentPhotoIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
   };
 
+  // Властивості анімації для кожного проекту
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.15, duration: 0.5, ease: 'easeOut' },
+    }),
+  };
+
   return (
     <section className="section bg-gray-50">
       <div className="container mx-auto px-4">
@@ -82,38 +87,44 @@ const LatestWorks = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {projects.map((project) => (
-            <div
+          {projects.map((project, i) => (
+            <motion.div
               key={project.id}
-              className="card overflow-hidden group cursor-pointer bg-white shadow-md rounded-lg hover:shadow-xl transition-shadow"
-              onClick={() => openProject(project)}
+              custom={i}
+              initial="hidden"
+              animate="visible"
+              variants={itemVariants}
             >
-              <div className="relative overflow-hidden">
-                <img 
-                  src={project.image_url} 
-                  alt={project.title}
-                  className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <div className="flex items-center text-white gap-2 font-medium">
-                    <Eye size={20} /> Переглянути проєкт
+              <div
+                className="card overflow-hidden group cursor-pointer bg-white shadow-md rounded-lg hover:shadow-xl transition-shadow"
+                onClick={() => openProject(project)}
+              >
+                <div className="relative overflow-hidden">
+                  <img 
+                    src={project.image_url} 
+                    alt={project.title}
+                    className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div className="flex items-center text-white gap-2 font-medium">
+                      <Eye size={20} /> Переглянути проєкт
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="p-6">
-                {/* Категорія та дата */}
-                <div className="flex justify-between items-center mb-2">
-                  <div className="flex items-center text-gray-500 text-sm gap-1">
-                    <Calendar size={14} /> {new Date(project.date).toLocaleDateString()}
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center text-gray-500 text-sm gap-1">
+                      <Calendar size={14} /> {new Date(project.date).toLocaleDateString()}
+                    </div>
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full capitalize">
+                      {project.category}
+                    </span>
                   </div>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full capitalize">
-                    {project.category}
-                  </span>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
+                  <p className="text-gray-600 text-sm">{project.description}</p>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
-                <p className="text-gray-600 text-sm">{project.description}</p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
@@ -125,7 +136,6 @@ const LatestWorks = () => {
         </div>
       </div>
 
-      {/* Modal for selected project */}
       {selectedProject && (
         <div
           className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
@@ -135,7 +145,6 @@ const LatestWorks = () => {
             className="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-full overflow-hidden relative"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close button */}
             <button
               onClick={closeProject}
               className="absolute top-3 right-3 z-50 bg-black/60 hover:bg-black/80 text-white p-2 rounded-full transition-colors"
@@ -144,7 +153,6 @@ const LatestWorks = () => {
               <X size={24} />
             </button>
 
-            {/* Carousel */}
             <div className="relative w-full h-96 overflow-hidden">
               {photos.length > 0 && (
                 <div
@@ -179,13 +187,11 @@ const LatestWorks = () => {
                 </>
               )}
 
-              {/* Photo indicator */}
               <div className="absolute bottom-2 right-2 bg-black/50 text-white text-sm px-3 py-1 rounded-full">
                 {currentPhotoIndex + 1} / {photos.length}
               </div>
             </div>
 
-            {/* Project info */}
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full capitalize">
