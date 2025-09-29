@@ -66,7 +66,7 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
             setEditingProject({
               title: '',
               description: '',
-              category: 'Житлові',
+              category: 'MSD Classic',
               date: '',
               image_url: '',
               images: [],
@@ -156,9 +156,9 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
                     setEditingProject({ ...editingProject, category: e.target.value })
                   }
                 >
-                  <option value="Житлові">Житлові</option>
-                  <option value="Комерційні">Комерційні</option>
-                  <option value="Громадські">Громадські</option>
+                  <option value="MSD Classic">MSD Classic</option>
+                  <option value="MSD Premium">MSD Premium</option>
+                  <option value="Bauf & Renolit">Bauf та Renolit</option>
                   <option value="Інше">Інше</option>
                 </select>
               </div>

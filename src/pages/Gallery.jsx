@@ -36,9 +36,9 @@ export const Gallery = () => {
 
   const categories = [
     { id: 'all', name: 'Усі проєкти' },
-    { id: 'Житлові', name: 'Житлові приміщення' },
-    { id: 'Комерційні', name: 'Комерційні приміщення' },
-    { id: 'Громадські', name: 'Громадські приміщення' },
+    { id: 'MSD Classic', name: 'MSD Classic' },
+    { id: 'MSD Premium', name: 'MSD Premium' },
+    { id: 'Bauf & Renolit', name: 'Bauf & Renolit' },
     { id: 'Інше', name: 'Інше' },
   ];
 
