@@ -9,6 +9,7 @@ import { GalleryTab } from "../components/GalleryTab";
 import { ChangePasswordTab } from "../components/ChangePasswordTab";
 import { SubmissionsTab } from "../components/SubmissionsTab";
 import { DashboardTab } from "../components/DashboardTab";
+import { ConfirmModal } from "../components/ConfirmModal";
 
 export const AdminPanel = () => {
   const [session, setSession] = useState(null);
@@ -28,6 +29,28 @@ export const AdminPanel = () => {
     setTimeout(() => {
       setNotifications((prev) => prev.filter((n) => n.id !== id));
     }, duration);
+  };
+
+  // Confirm Modal
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: null,
+  });
+
+  const openConfirmModal = ({ title, message, onConfirm }) => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => onConfirm(() => setConfirmModal({ ...confirmModal, isOpen: false }))
+    });
+  };
+
+
+  const closeConfirmModal = () => {
+    setConfirmModal({ ...confirmModal, isOpen: false });
   };
 
   // слідкуємо за сесією
@@ -111,26 +134,40 @@ export const AdminPanel = () => {
     }
   };
 
-  const handleDeleteProjectClick = async (projectId) => {
-    if (!window.confirm("Ви впевнені, що хочете видалити цей проєкт?")) return;
-    try {
-      await deleteProject(projectId);
-      loadProjects();
-      showNotification("Проєкт видалено!", "success");
-    } catch (err) {
-      showNotification("Помилка при видаленні проекту: " + err.message, "error");
-    }
+  const handleDeleteProjectClick = (projectId) => {
+    openConfirmModal({
+      title: "Видалити проєкт?",
+      message: "Ви впевнені, що хочете видалити цей проєкт? Цю дію не можна буде скасувати.",
+      onConfirm: async () => {
+        try {
+          await deleteProject(projectId);
+          loadProjects();
+          showNotification("Проєкт видалено!", "success");
+        } catch (err) {
+          showNotification("Помилка при видаленні проекту: " + err.message, "error");
+        } finally {
+          closeConfirmModal();
+        }
+      },
+    });
   };
 
-  const handleDeleteSubmissionClick = async (submissionId) => {
-    if (!window.confirm("Ви впевнені, що хочете видалити цю заявку?")) return;
-    try {
-      await deleteSubmission(submissionId);
-      loadSubmissions();
-      showNotification("Заявку видалено!", "success");
-    } catch (err) {
-      showNotification("Помилка при видаленні заявки: " + err.message, "error");
-    }
+  const handleDeleteSubmissionClick = (submissionId) => {
+    openConfirmModal({
+      title: "Видалити заявку?",
+      message: "Ви впевнені, що хочете видалити цю заявку? Цю дію не можна буде скасувати.",
+      onConfirm: async () => {
+        try {
+          await deleteSubmission(submissionId);
+          loadSubmissions();
+          showNotification("Заявку видалено!", "success");
+        } catch (err) {
+          showNotification("Помилка при видаленні заявки: " + err.message, "error");
+        } finally {
+          closeConfirmModal();
+        }
+      },
+    });
   };
 
   // форма входу
@@ -190,17 +227,12 @@ export const AdminPanel = () => {
           ${n.type === "error" ? "bg-red-600" : ""}
           ${n.type === "info" ? "bg-blue-600" : ""}`}
             >
-              {/* Іконка */}
               <div className="flex-shrink-0">
                 {n.type === "success" && <CheckCircle size={24} />}
                 {n.type === "error" && <XCircle size={24} />}
                 {n.type === "info" && <Info size={24} />}
               </div>
-
-              {/* Текст */}
               <div className="flex-1 text-sm font-medium">{n.message}</div>
-
-              {/* Кнопка закриття */}
               <button
                 onClick={() =>
                   setNotifications((prev) => prev.filter((x) => x.id !== n.id))
@@ -209,8 +241,6 @@ export const AdminPanel = () => {
               >
                 <X size={16} />
               </button>
-
-              {/* Прогрес-бар */}
               <motion.div
                 initial={{ width: "100%" }}
                 animate={{ width: "0%" }}
@@ -221,6 +251,16 @@ export const AdminPanel = () => {
           ))}
         </AnimatePresence>
       </div>
+
+      {/* Confirm Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={confirmModal.onConfirm}
+        onCancel={closeConfirmModal}
+      />
+
       <div className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center h-16">
@@ -234,7 +274,6 @@ export const AdminPanel = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar */}
           <div className="lg:w-1/4">
             <nav className="card p-6">
               <ul className="space-y-2">
@@ -286,16 +325,11 @@ export const AdminPanel = () => {
             </nav>
           </div>
 
-          {/* Main Content */}
           <div className="lg:w-3/4">
             {activeTab === "dashboard" && (
               <DashboardTab projects={projects} submissions={submissions} />
             )}
-
-            {activeTab === "gallery" && (
-              <GalleryTab showNotification={showNotification} />
-            )}
-
+            {activeTab === "gallery" && <GalleryTab showNotification={showNotification} openConfirmModal={openConfirmModal} />}
             {activeTab === "submissions" && (
               <SubmissionsTab
                 submissions={submissions}
@@ -303,7 +337,6 @@ export const AdminPanel = () => {
                 showNotification={showNotification}
               />
             )}
-
             {activeTab === "changePassword" && (
               <ChangePasswordTab showNotification={showNotification} />
             )}

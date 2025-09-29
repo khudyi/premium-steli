@@ -3,7 +3,7 @@ import { getProjects, addProject, updateProject, deleteProject } from '../lib/pr
 import { uploadImage } from '../lib/storage';
 import { Trash2, Plus, X, Calendar } from 'lucide-react';
 
-export const GalleryTab = ({ showNotification }) => {
+export const GalleryTab = ({ showNotification, openConfirmModal }) => {
   const [projects, setProjects] = useState([]);
   const [editingProject, setEditingProject] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -40,16 +40,22 @@ export const GalleryTab = ({ showNotification }) => {
     setLoading(false);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Ви впевнені, що хочете видалити цей проєкт?')) return;
-    try {
-      await deleteProject(id);
-      showNotification('Проєкт видалено!', 'success');
-      loadProjects();
-    } catch (err) {
-      showNotification('Помилка при видаленні проєкту: ' + err.message, 'error');
-    }
-  };
+  const handleDelete = (id) => {
+  openConfirmModal({
+    title: 'Видалити проєкт?',
+    message: 'Ви впевнені, що хочете видалити цей проєкт? Цю дію не можна буде скасувати.',
+    onConfirm: async (closeModal) => {
+      try {
+        await deleteProject(id);
+        showNotification('Проєкт видалено!', 'success');
+        loadProjects();
+        closeModal();
+      } catch (err) {
+        showNotification('Помилка при видаленні проєкту: ' + err.message, 'error');
+      }
+    },
+  });
+};
 
   return (
     <div className="space-y-6">
@@ -114,7 +120,7 @@ export const GalleryTab = ({ showNotification }) => {
         ))}
       </div>
 
-      {/* Модальне вікно */}
+      {/* Модальне вікно редагування */}
       {editingProject && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-auto">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6 relative">
