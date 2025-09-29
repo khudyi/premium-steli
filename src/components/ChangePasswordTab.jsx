@@ -1,3 +1,5 @@
+import { supabase } from "../lib/supabaseClient";
+
 import { useState } from "react";
 
 export const ChangePasswordTab = ({ showNotification }) => {
