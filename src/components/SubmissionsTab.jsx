@@ -2,13 +2,17 @@ import { Phone, Mail, Trash2, Copy, Check } from "lucide-react";
 import { useState } from "react";
 
 export const SubmissionsTab = ({ submissions, handleDeleteSubmissionClick, showNotification }) => {
-  const [copied, setCopied] = useState(null); // зберігаємо що саме скопійовано
+  // тепер зберігаємо об'єкт: { id, type }
+  const [copied, setCopied] = useState(null);
 
-  const handleCopy = (text, type) => {
+  const handleCopy = (text, type, id) => {
     navigator.clipboard.writeText(text).then(() => {
-      setCopied(type);
-      showNotification(`${type === "phone" ? "Номер" : "Email"} скопійовано!`, "success");
-      setTimeout(() => setCopied(null), 2000); // після 2 сек забрати іконку
+      setCopied({ id, type }); // зберігаємо id + тип
+      showNotification(
+        `${type === "phone" ? "Номер" : "Email"} скопійовано!`,
+        "success"
+      );
+      setTimeout(() => setCopied(null), 2000);
     });
   };
 
@@ -66,11 +70,13 @@ export const SubmissionsTab = ({ submissions, handleDeleteSubmissionClick, showN
                       {submission.phone}
                     </a>
                     <button
-                      onClick={() => handleCopy(submission.phone, "phone")}
+                      onClick={() => handleCopy(submission.phone, "phone", submission.id)}
                       className="text-gray-400 hover:text-blue-600 transition-colors"
                       title="Скопіювати номер"
                     >
-                      {copied === "phone" ? <Check size={16} /> : <Copy size={16} />}
+                      {copied?.id === submission.id && copied?.type === "phone"
+                        ? <Check size={16} />
+                        : <Copy size={16} />}
                     </button>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -82,11 +88,13 @@ export const SubmissionsTab = ({ submissions, handleDeleteSubmissionClick, showN
                       {submission.email}
                     </a>
                     <button
-                      onClick={() => handleCopy(submission.email, "email")}
+                      onClick={() => handleCopy(submission.email, "email", submission.id)}
                       className="text-gray-400 hover:text-blue-600 transition-colors"
                       title="Скопіювати email"
                     >
-                      {copied === "email" ? <Check size={16} /> : <Copy size={16} />}
+                      {copied?.id === submission.id && copied?.type === "email"
+                        ? <Check size={16} />
+                        : <Copy size={16} />}
                     </button>
                   </div>
                 </div>
