@@ -340,7 +340,10 @@ export const AdminPanel = () => {
               />
             )}
             {activeTab === "changePassword" && (
-              <ChangePasswordTab showNotification={showNotification} />
+              <ChangePasswordTab 
+                showNotification={showNotification} 
+                session={session}
+                />
             )}
           </div>
         </div>

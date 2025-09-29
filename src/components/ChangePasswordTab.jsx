@@ -1,31 +1,46 @@
+import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
-import { useState } from "react";
-
-export const ChangePasswordTab = ({ showNotification }) => {
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+export const ChangePasswordTab = ({ showNotification, session }) => {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      showNotification('Новий пароль і підтвердження не співпадають!', 'error');
+
+    if (!session) {
+      showNotification(
+        "Сесія користувача відсутня. Будь ласка, увійдіть заново.",
+        "error"
+      );
       return;
     }
+
+    if (newPassword !== confirmPassword) {
+      showNotification("Новий пароль і підтвердження не співпадають!", "error");
+      return;
+    }
+
     setLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
       if (error) throw error;
-      showNotification('Пароль успішно змінено!', 'success');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
+
+      showNotification("Пароль успішно змінено!", "success");
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (err) {
-      showNotification('Помилка при зміні пароля: ' + err.message, 'error');
+      showNotification("Помилка при зміні пароля: " + err.message, "error");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -62,8 +77,12 @@ export const ChangePasswordTab = ({ showNotification }) => {
             required
           />
         </div>
-        <button type="submit" disabled={loading} className="btn btn-primary w-full">
-          {loading ? 'Змінюємо...' : 'Змінити пароль'}
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn btn-primary w-full"
+        >
+          {loading ? "Змінюємо..." : "Змінити пароль"}
         </button>
       </form>
     </div>
