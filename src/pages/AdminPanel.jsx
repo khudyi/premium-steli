@@ -335,6 +335,7 @@ export const AdminPanel = () => {
                 submissions={submissions}
                 handleDeleteSubmissionClick={handleDeleteSubmissionClick}
                 showNotification={showNotification}
+                openConfirmModal={openConfirmModal}
               />
             )}
             {activeTab === "changePassword" && (

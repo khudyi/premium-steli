@@ -1,17 +1,13 @@
 import { Phone, Mail, Trash2, Copy, Check } from "lucide-react";
 import { useState } from "react";
 
-export const SubmissionsTab = ({ submissions, handleDeleteSubmissionClick, showNotification }) => {
-  // тепер зберігаємо об'єкт: { id, type }
+export const SubmissionsTab = ({ submissions, handleDeleteSubmissionClick, showNotification, openConfirmModal }) => {
   const [copied, setCopied] = useState(null);
 
   const handleCopy = (text, type, id) => {
     navigator.clipboard.writeText(text).then(() => {
-      setCopied({ id, type }); // зберігаємо id + тип
-      showNotification(
-        `${type === "phone" ? "Номер" : "Email"} скопійовано!`,
-        "success"
-      );
+      setCopied({ id, type });
+      showNotification(`${type === "phone" ? "Номер" : "Email"} скопійовано!`, "success");
       setTimeout(() => setCopied(null), 2000);
     });
   };
@@ -46,12 +42,20 @@ export const SubmissionsTab = ({ submissions, handleDeleteSubmissionClick, showN
                     </p>
                   </div>
                   <button
-                    onClick={() => {
-                      if (window.confirm("Ви впевнені, що хочете видалити цю заявку?")) {
-                        handleDeleteSubmissionClick(submission.id);
-                        showNotification("Заявку видалено!", "success");
-                      }
-                    }}
+                    onClick={() =>
+                      openConfirmModal({
+                        title: "Видалити заявку?",
+                        message: "Ви впевнені, що хочете видалити цю заявку? Цю дію не можна буде скасувати.",
+                        onConfirm: async () => {
+                          try {
+                            await handleDeleteSubmissionClick(submission.id);
+                            showNotification("Заявку видалено!", "success");
+                          } catch (err) {
+                            showNotification("Помилка при видаленні заявки: " + err.message, "error");
+                          }
+                        },
+                      })
+                    }
                     className="text-red-600 hover:text-red-800 transition-colors"
                     aria-label="Видалити заявку"
                   >
@@ -74,9 +78,11 @@ export const SubmissionsTab = ({ submissions, handleDeleteSubmissionClick, showN
                       className="text-gray-400 hover:text-blue-600 transition-colors"
                       title="Скопіювати номер"
                     >
-                      {copied?.id === submission.id && copied?.type === "phone"
-                        ? <Check size={16} />
-                        : <Copy size={16} />}
+                      {copied?.id === submission.id && copied?.type === "phone" ? (
+                        <Check size={16} />
+                      ) : (
+                        <Copy size={16} />
+                      )}
                     </button>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -92,9 +98,11 @@ export const SubmissionsTab = ({ submissions, handleDeleteSubmissionClick, showN
                       className="text-gray-400 hover:text-blue-600 transition-colors"
                       title="Скопіювати email"
                     >
-                      {copied?.id === submission.id && copied?.type === "email"
-                        ? <Check size={16} />
-                        : <Copy size={16} />}
+                      {copied?.id === submission.id && copied?.type === "email" ? (
+                        <Check size={16} />
+                      ) : (
+                        <Copy size={16} />
+                      )}
                     </button>
                   </div>
                 </div>
