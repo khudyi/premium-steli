@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
+
 import { Lock, Eye, BarChart3, Mail, CheckCircle, XCircle, Info, X } from "lucide-react";
 import { getProjects, addProject, updateProject, deleteProject } from "../lib/projects";
 import { getSubmissions, deleteSubmission } from "../lib/submissions";
@@ -333,7 +334,7 @@ export const AdminPanel = () => {
             {activeTab === "submissions" && (
               <SubmissionsTab
                 submissions={submissions}
-                handleDeleteSubmissionClick={handleDeleteSubmissionClick}
+                handleDeleteSubmissionClick={deleteSubmission}
                 showNotification={showNotification}
                 openConfirmModal={openConfirmModal}
               />

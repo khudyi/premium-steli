@@ -1,14 +1,43 @@
 import { Phone, Mail, Trash2, Copy, Check } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export const SubmissionsTab = ({ submissions, handleDeleteSubmissionClick, showNotification, openConfirmModal }) => {
+export const SubmissionsTab = ({
+  submissions: initialSubmissions,
+  handleDeleteSubmissionClick,
+  showNotification,
+  openConfirmModal,
+}) => {
+  const [submissions, setSubmissions] = useState(initialSubmissions || []);
   const [copied, setCopied] = useState(null);
+
+  // Оновлюємо локальний стан, якщо пропс initialSubmissions зміниться
+  useEffect(() => {
+    setSubmissions(initialSubmissions || []);
+  }, [initialSubmissions]);
 
   const handleCopy = (text, type, id) => {
     navigator.clipboard.writeText(text).then(() => {
       setCopied({ id, type });
       showNotification(`${type === "phone" ? "Номер" : "Email"} скопійовано!`, "success");
       setTimeout(() => setCopied(null), 2000);
+    });
+  };
+
+  const confirmDelete = (submissionId) => {
+    openConfirmModal({
+      title: "Видалити заявку?",
+      message: "Ви впевнені, що хочете видалити цю заявку? Цю дію не можна буде скасувати.",
+      onConfirm: async (close) => {
+        try {
+          await handleDeleteSubmissionClick(submissionId); // Видаляємо заявку на сервері
+          // Оновлюємо локальний стан, видаляючи заявку
+          setSubmissions((prev) => prev.filter((s) => s.id !== submissionId));
+          showNotification("Заявку видалено!", "success");
+          close(); // Закриваємо модальне вікно
+        } catch (err) {
+          showNotification("Помилка при видаленні заявки: " + err.message, "error");
+        }
+      },
     });
   };
 
@@ -42,20 +71,7 @@ export const SubmissionsTab = ({ submissions, handleDeleteSubmissionClick, showN
                     </p>
                   </div>
                   <button
-                    onClick={() =>
-                      openConfirmModal({
-                        title: "Видалити заявку?",
-                        message: "Ви впевнені, що хочете видалити цю заявку? Цю дію не можна буде скасувати.",
-                        onConfirm: async () => {
-                          try {
-                            await handleDeleteSubmissionClick(submission.id);
-                            showNotification("Заявку видалено!", "success");
-                          } catch (err) {
-                            showNotification("Помилка при видаленні заявки: " + err.message, "error");
-                          }
-                        },
-                      })
-                    }
+                    onClick={() => confirmDelete(submission.id)}
                     className="text-red-600 hover:text-red-800 transition-colors"
                     aria-label="Видалити заявку"
                   >
