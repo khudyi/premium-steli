@@ -51,7 +51,7 @@ export const SubmissionsTab = ({ submissions, handleDeleteSubmissionClick, showN
                     className="text-red-600 hover:text-red-800 transition-colors"
                     aria-label="Видалити заявку"
                   >
-                    <Trash2 size={20} />
+                    <Trash2 size={28} />
                   </button>
                 </div>
 
