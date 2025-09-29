@@ -82,13 +82,13 @@ export const Footer = () => {
                 <Phone size={16} className="text-blue-400" />
                 <ul>
                   <li>
-                    <a href="tel:+380979526777" className="text-gray-400">0 (97) 952 67 77</a>
+                    <a href="tel:+380979526777" className="text-gray-400 hover:text-white transition-colors">0 (97) 952 67 77</a>
                   </li>
                   <li>
-                    <a href="tel:+380509526773" className="text-gray-400">0 (50) 952 67 73</a>
+                    <a href="tel:+380509526773" className="text-gray-400 hover:text-white transition-colors">0 (50) 952 67 73</a>
                   </li>
                   <li>
-                    <a href="tel:+380739526773" className="text-gray-400">0 (73) 952 67 73</a>
+                    <a href="tel:+380739526773" className="text-gray-400 hover:text-white transition-colors">0 (73) 952 67 73</a>
                   </li>
                 </ul>
               </div>
