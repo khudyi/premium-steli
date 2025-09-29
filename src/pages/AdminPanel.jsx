@@ -176,31 +176,31 @@ export const AdminPanel = () => {
   return (
     <div className="min-h-screen bg-gray-100 relative">
       {/* Notifications */}
-      <div className="fixed bottom-4 right-4 space-y-3 z-50">
+      <div className="fixed top-4 right-4 space-y-3 z-[9999]">
         <AnimatePresence>
           {notifications.map((n) => (
             <motion.div
               key={n.id}
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
               transition={{ duration: 0.3 }}
               className={`relative flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-white w-80 overflow-hidden
-                ${n.type === "success" ? "bg-green-600" : ""}
-                ${n.type === "error" ? "bg-red-600" : ""}
-                ${n.type === "info" ? "bg-blue-600" : ""}`}
+          ${n.type === "success" ? "bg-green-600" : ""}
+          ${n.type === "error" ? "bg-red-600" : ""}
+          ${n.type === "info" ? "bg-blue-600" : ""}`}
             >
-              {/* Icon */}
+              {/* Іконка */}
               <div className="flex-shrink-0">
                 {n.type === "success" && <CheckCircle size={24} />}
                 {n.type === "error" && <XCircle size={24} />}
                 {n.type === "info" && <Info size={24} />}
               </div>
 
-              {/* Text */}
+              {/* Текст */}
               <div className="flex-1 text-sm font-medium">{n.message}</div>
 
-              {/* Close button */}
+              {/* Кнопка закриття */}
               <button
                 onClick={() =>
                   setNotifications((prev) => prev.filter((x) => x.id !== n.id))
@@ -210,7 +210,7 @@ export const AdminPanel = () => {
                 <X size={16} />
               </button>
 
-              {/* Progress bar */}
+              {/* Прогрес-бар */}
               <motion.div
                 initial={{ width: "100%" }}
                 animate={{ width: "0%" }}
@@ -221,7 +221,6 @@ export const AdminPanel = () => {
           ))}
         </AnimatePresence>
       </div>
-
       <div className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center h-16">
@@ -242,11 +241,10 @@ export const AdminPanel = () => {
                 <li>
                   <button
                     onClick={() => setActiveTab("dashboard")}
-                    className={`w-full text-left p-3 rounded-lg transition-colors ${
-                      activeTab === "dashboard"
+                    className={`w-full text-left p-3 rounded-lg transition-colors ${activeTab === "dashboard"
                         ? "bg-blue-600 text-white"
                         : "hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     <BarChart3 className="inline mr-2" size={20} /> Dashboard
                   </button>
@@ -254,11 +252,10 @@ export const AdminPanel = () => {
                 <li>
                   <button
                     onClick={() => setActiveTab("gallery")}
-                    className={`w-full text-left p-3 rounded-lg transition-colors ${
-                      activeTab === "gallery"
+                    className={`w-full text-left p-3 rounded-lg transition-colors ${activeTab === "gallery"
                         ? "bg-blue-600 text-white"
                         : "hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     <Eye className="inline mr-2" size={20} /> Управління галереєю
                   </button>
@@ -266,11 +263,10 @@ export const AdminPanel = () => {
                 <li>
                   <button
                     onClick={() => setActiveTab("submissions")}
-                    className={`w-full text-left p-3 rounded-lg transition-colors ${
-                      activeTab === "submissions"
+                    className={`w-full text-left p-3 rounded-lg transition-colors ${activeTab === "submissions"
                         ? "bg-blue-600 text-white"
                         : "hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     <Mail className="inline mr-2" size={20} /> Заявки
                   </button>
@@ -278,11 +274,10 @@ export const AdminPanel = () => {
                 <li>
                   <button
                     onClick={() => setActiveTab("changePassword")}
-                    className={`w-full text-left p-3 rounded-lg transition-colors ${
-                      activeTab === "changePassword"
+                    className={`w-full text-left p-3 rounded-lg transition-colors ${activeTab === "changePassword"
                         ? "bg-blue-600 text-white"
                         : "hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     <Lock className="inline mr-2" size={20} /> Змінити пароль
                   </button>
