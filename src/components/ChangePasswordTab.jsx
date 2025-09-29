@@ -15,6 +15,8 @@ export const ChangePasswordTab = ({ showNotification, session }) => {
         "Сесія користувача відсутня. Будь ласка, увійдіть заново.",
         "error"
       );
+      await supabase.auth.signOut();
+      
       return;
     }
 

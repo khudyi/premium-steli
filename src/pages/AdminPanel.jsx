@@ -49,12 +49,11 @@ export const AdminPanel = () => {
     });
   };
 
-
   const closeConfirmModal = () => {
     setConfirmModal({ ...confirmModal, isOpen: false });
   };
 
-  // слідкуємо за сесією
+  // Слідкуємо за сесією та автоматично виходимо при втраті
   useEffect(() => {
     const getSession = async () => {
       const { data } = await supabase.auth.getSession();
@@ -63,7 +62,14 @@ export const AdminPanel = () => {
     getSession();
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      if (!session) {
+        setSession(null);
+        setEmail("");
+        setPassword("");
+        showNotification("Сесія втрачена або недійсна. Будь ласка, увійдіть заново.", "error");
+      } else {
+        setSession(session);
+      }
     });
 
     return () => {
@@ -71,7 +77,7 @@ export const AdminPanel = () => {
     };
   }, []);
 
-  // завантаження даних
+  // Завантаження даних
   useEffect(() => {
     if (session) {
       loadProjects();
@@ -97,7 +103,7 @@ export const AdminPanel = () => {
     }
   };
 
-  // логін
+  // Логін
   const handleLogin = async (e) => {
     e.preventDefault();
     const { error } = await supabase.auth.signInWithPassword({
@@ -109,9 +115,12 @@ export const AdminPanel = () => {
     }
   };
 
-  // вихід
+  // Вихід
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    setSession(null);
+    setEmail("");
+    setPassword("");
   };
 
   const handleSaveProject = async (e) => {
@@ -171,7 +180,7 @@ export const AdminPanel = () => {
     });
   };
 
-  // форма входу
+  // Форма входу
   if (!session) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
