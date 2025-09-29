@@ -23,7 +23,7 @@ const AnimatedNumber = ({ value, duration = 2.3, decimals = 0 }) => {
   return <span ref={ref}>{formatted}</span>;
 };
 
-const HeroSection = () => {
+export const HeroSection = () => {
   return (
     <section className="relative bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 text-white overflow-hidden">
       {/* Статичний фон */}
@@ -176,5 +176,3 @@ const HeroSection = () => {
     </section>
   );
 };
-
-export default HeroSection;

@@ -4,7 +4,7 @@ import { ArrowRight, Eye, X, ChevronLeft, ChevronRight, Calendar } from 'lucide-
 import { getProjects } from '../lib/projects';
 import { motion } from 'framer-motion';
 
-const LatestWorks = () => {
+export const LatestWorks = () => {
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
@@ -224,5 +224,3 @@ const LatestWorks = () => {
     </section>
   );
 };
-
-export default LatestWorks;

@@ -3,7 +3,7 @@ import { Check, Layers, Star, Sparkles, Info, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { addSubmission } from "../lib/submissions";
 
-const ServicesSection = () => {
+export const ServicesSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -281,5 +281,3 @@ const ServicesSection = () => {
     </section>
   );
 };
-
-export default ServicesSection;

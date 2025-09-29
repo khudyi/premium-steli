@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Eye, Calendar, X, ChevronLeft, ChevronRight } from 'lucide-react';
-import Footer from '../components/Footer';
-import { getProjects } from '../lib/projects';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getProjects } from '../lib/projects';
 
-const Gallery = () => {
+export const Gallery = () => {
   const [projects, setProjects] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedProject, setSelectedProject] = useState(null);
@@ -311,5 +310,3 @@ const Gallery = () => {
     </div>
   );
 };
-
-export default Gallery;

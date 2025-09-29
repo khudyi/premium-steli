@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { Lock, Eye, Trash2, Plus, BarChart3, Mail, Calendar } from 'lucide-react';
+import { Lock, Eye, BarChart3, Mail } from 'lucide-react';
 import { getProjects, addProject, updateProject, deleteProject } from '../lib/projects';
 import { getSubmissions, deleteSubmission } from '../lib/submissions';
-import { uploadImage } from '../lib/storage';
-import { GalleryTab } from '../components/GalleryTab';
 
-const AdminPanel = () => {
+import { GalleryTab } from '../components/GalleryTab';
+import { ChangePasswordTab } from '../components/ChangePasswordTab';
+import { SubmissionsTab } from '../components/SubmissionsTab';
+import { DashboardTab } from '../components/DashboardTab';
+
+export const AdminPanel = () => {
   const [session, setSession] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -258,161 +261,6 @@ const AdminPanel = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-export default AdminPanel;
-
-// --- Components ---
-
-const DashboardTab = ({ projects, submissions }) => (
-  <div>
-    <h2 className="text-2xl font-bold text-gray-900 mb-6">Панель керування</h2>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <Card title="Всього проєктів" value={projects.length} icon={<Eye size={32} className="text-blue-600" />} />
-      <Card title="Заявки" value={submissions.length} icon={<Mail size={32} className="text-green-600" />} />
-      <Card
-        title="Недавні заявки"
-        value={submissions.filter(s => new Date(s.timestamp) > new Date(Date.now() - 7*24*60*60*1000)).length}
-        icon={<Calendar size={32} className="text-amber-600" />}
-      />
-    </div>
-  </div>
-);
-
-const Card = ({ title, value, icon }) => (
-  <div className="card p-6">
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-gray-600">{title}</p>
-        <p className="text-3xl font-bold text-blue-600">{value}</p>
-      </div>
-      {icon}
-    </div>
-  </div>
-);
-
-// --- SubmissionsTab ---
-export const SubmissionsTab = ({ submissions, handleDeleteSubmissionClick, showNotification }) => (
-  <div>
-    <h2 className="text-2xl font-bold text-gray-900 mb-6">Заявки</h2>
-    <div className="space-y-4">
-      {submissions.length === 0 ? (
-        <div className="card p-8 text-center">
-          <Mail className="mx-auto text-gray-400 mb-4" size={48} />
-          <p className="text-gray-600">Заявок ще немає.</p>
-        </div>
-      ) : (
-        submissions
-          .slice()
-          .reverse()
-          .map((submission) => (
-            <div key={submission.id} className="card p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">{submission.name}</h3>
-                  <p className="text-gray-600">
-                    {new Date(submission.timestamp).toLocaleDateString()}{' '}
-                    {new Date(submission.timestamp).toLocaleTimeString()}
-                  </p>
-                </div>
-                <button
-                  onClick={() => {
-                    handleDeleteSubmissionClick(submission.id);
-                    showNotification('Заявку видалено!', 'success');
-                  }}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  <Trash2 size={20} />
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <strong>Номер телефону:</strong> {submission.phone}
-                </div>
-                <div>
-                  <strong>Email:</strong> {submission.email}
-                </div>
-              </div>
-              <div>
-                <strong>Деталі проєкту:</strong>
-                <p className="text-gray-700 mt-2 p-4 bg-gray-50 rounded-lg">
-                  {submission.project_details}
-                </p>
-              </div>
-            </div>
-          ))
-      )}
-    </div>
-  </div>
-);
-
-// --- ChangePasswordTab ---
-export const ChangePasswordTab = ({ showNotification }) => {
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleChangePassword = async (e) => {
-    e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      showNotification('Новий пароль і підтвердження не співпадають!', 'error');
-      return;
-    }
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-      if (error) throw error;
-      showNotification('Пароль успішно змінено!', 'success');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch (err) {
-      showNotification('Помилка при зміні пароля: ' + err.message, 'error');
-    }
-    setLoading(false);
-  };
-
-  return (
-    <div className="card p-6 max-w-md">
-      <h2 className="text-2xl font-bold mb-4">Змінити пароль</h2>
-      <form onSubmit={handleChangePassword}>
-        <div className="form-group mb-4">
-          <label className="form-label">Поточний пароль</label>
-          <input
-            type="password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            className="form-input"
-            required
-          />
-        </div>
-        <div className="form-group mb-4">
-          <label className="form-label">Новий пароль</label>
-          <input
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="form-input"
-            required
-          />
-        </div>
-        <div className="form-group mb-4">
-          <label className="form-label">Підтвердити новий пароль</label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="form-input"
-            required
-          />
-        </div>
-        <button type="submit" disabled={loading} className="btn btn-primary w-full">
-          {loading ? 'Змінюємо...' : 'Змінити пароль'}
-        </button>
-      </form>
     </div>
   );
 };

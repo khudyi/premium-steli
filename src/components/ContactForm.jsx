@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Phone, Mail, MapPin, Send } from 'lucide-react';
 import { addSubmission } from '../lib/submissions';
 
-const ContactForm = () => {
-  const [formData, setFormData] = useState({
+export const ContactForm = () => {
+   const [formData, setFormData] = useState({
     name: '',
     phone: '',
     email: '',
@@ -222,5 +222,3 @@ const ContactForm = () => {
     </section>
   );
 };
-
-export default ContactForm;

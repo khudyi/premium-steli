@@ -2,7 +2,7 @@ import { Phone, Mail, Instagram } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 
-const Footer = () => {
+export const Footer = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.3 });
 
@@ -107,5 +107,3 @@ const Footer = () => {
     </motion.footer>
   );
 };
-
-export default Footer;

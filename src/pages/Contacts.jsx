@@ -1,9 +1,9 @@
 import { Phone, Mail, MapPin, Clock, Award, Users, Star } from 'lucide-react';
-import ContactForm from '../components/ContactForm';
-import Footer from '../components/Footer';
 import { motion } from 'framer-motion';
 
-const Contacts = () => {
+import { ContactForm } from '../components/ContactForm';
+
+export const Contacts = () => {
   const fadeUp = { initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true }, transition: { duration: 0.7 } };
   
   return (
@@ -124,5 +124,3 @@ const Contacts = () => {
     </div>
   );
 };
-
-export default Contacts;

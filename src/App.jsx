@@ -1,13 +1,14 @@
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect } from 'react';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import Homepage from './pages/Homepage';
-import Gallery from './pages/Gallery';
-import Contacts from './pages/Contacts';
-import AdminPanel from './pages/AdminPanel';
-import ScrollToTop from './components/ScrollToTop';
+import { ScrollToTop } from './components/ScrollToTop';
+import { Navbar } from './components/Navbar';
+import { Footer } from './components/Footer';
+import { Homepage } from './pages/Homepage';
+import { Gallery } from './pages/Gallery';
+import { Contacts } from './pages/Contacts';
+import { AdminPanel } from './pages/AdminPanel';
+
 import './App.css';
 
 function PageWrapper({ children }) {

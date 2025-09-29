@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
-import HeroSection from '../components/HeroSection';
-import LatestWorks from '../components/LatestWorks';
-import ServicesSection from '../components/ServicesSection';
-import ContactForm from '../components/ContactForm';
-import Footer from '../components/Footer';
+
+import { HeroSection } from '../components/HeroSection';
+import { LatestWorks } from '../components/LatestWorks';
+import { ServicesSection } from '../components/ServicesSection';
+import { ContactForm } from '../components/ContactForm';
+
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 50 },
@@ -34,7 +35,7 @@ const staggerContainer = {
   }
 };
 
-const Homepage = () => {
+export const Homepage = () => {
   return (
     <div>
       <HeroSection />
@@ -78,5 +79,3 @@ const Homepage = () => {
     </div>
   );
 };
-
-export default Homepage;
