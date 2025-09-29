@@ -1,19 +1,20 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import { Lock, Eye, BarChart3, Mail } from 'lucide-react';
-import { getProjects, addProject, updateProject, deleteProject } from '../lib/projects';
-import { getSubmissions, deleteSubmission } from '../lib/submissions';
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabaseClient";
+import { Lock, Eye, BarChart3, Mail, CheckCircle, XCircle, Info, X } from "lucide-react";
+import { getProjects, addProject, updateProject, deleteProject } from "../lib/projects";
+import { getSubmissions, deleteSubmission } from "../lib/submissions";
+import { motion, AnimatePresence } from "framer-motion";
 
-import { GalleryTab } from '../components/GalleryTab';
-import { ChangePasswordTab } from '../components/ChangePasswordTab';
-import { SubmissionsTab } from '../components/SubmissionsTab';
-import { DashboardTab } from '../components/DashboardTab';
+import { GalleryTab } from "../components/GalleryTab";
+import { ChangePasswordTab } from "../components/ChangePasswordTab";
+import { SubmissionsTab } from "../components/SubmissionsTab";
+import { DashboardTab } from "../components/DashboardTab";
 
 export const AdminPanel = () => {
   const [session, setSession] = useState(null);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [projects, setProjects] = useState([]);
   const [submissions, setSubmissions] = useState([]);
   const [editingProject, setEditingProject] = useState(null);
@@ -21,12 +22,12 @@ export const AdminPanel = () => {
   // Notifications
   const [notifications, setNotifications] = useState([]);
 
-  const showNotification = (message, type = 'success') => {
+  const showNotification = (message, type = "info", duration = 4000) => {
     const id = Date.now();
-    setNotifications((prev) => [...prev, { id, message, type }]);
+    setNotifications((prev) => [...prev, { id, message, type, duration }]);
     setTimeout(() => {
       setNotifications((prev) => prev.filter((n) => n.id !== id));
-    }, 4000);
+    }, duration);
   };
 
   // слідкуємо за сесією
@@ -59,7 +60,7 @@ export const AdminPanel = () => {
       const data = await getProjects();
       setProjects(data);
     } catch (err) {
-      showNotification('Помилка при завантаженні проєктів: ' + err.message, 'error');
+      showNotification("Помилка при завантаженні проєктів: " + err.message, "error");
     }
   };
 
@@ -68,7 +69,7 @@ export const AdminPanel = () => {
       const data = await getSubmissions();
       setSubmissions(data);
     } catch (err) {
-      showNotification('Помилка при завантаженні заявок: ' + err.message, 'error');
+      showNotification("Помилка при завантаженні заявок: " + err.message, "error");
     }
   };
 
@@ -80,7 +81,7 @@ export const AdminPanel = () => {
       password,
     });
     if (error) {
-      showNotification('Помилка входу: ' + error.message, 'error');
+      showNotification("Помилка входу: " + error.message, "error");
     }
   };
 
@@ -92,43 +93,43 @@ export const AdminPanel = () => {
   const handleSaveProject = async (e) => {
     e.preventDefault();
     if (!editingProject.image_url) {
-      showNotification('Будь ласка, завантажте зображення проекту', 'error');
+      showNotification("Будь ласка, завантажте зображення проекту", "error");
       return;
     }
     try {
       if (editingProject.id) {
         await updateProject(editingProject.id, editingProject);
-        showNotification('Проєкт оновлено!', 'success');
+        showNotification("Проєкт оновлено!", "success");
       } else {
         await addProject(editingProject);
-        showNotification('Проєкт додано!', 'success');
+        showNotification("Проєкт додано!", "success");
       }
       setEditingProject(null);
       loadProjects();
     } catch (err) {
-      showNotification('Помилка при збереженні проекту: ' + err.message, 'error');
+      showNotification("Помилка при збереженні проекту: " + err.message, "error");
     }
   };
 
   const handleDeleteProjectClick = async (projectId) => {
-    if (!window.confirm('Ви впевнені, що хочете видалити цей проєкт?')) return;
+    if (!window.confirm("Ви впевнені, що хочете видалити цей проєкт?")) return;
     try {
       await deleteProject(projectId);
       loadProjects();
-      showNotification('Проєкт видалено!', 'success');
+      showNotification("Проєкт видалено!", "success");
     } catch (err) {
-      showNotification('Помилка при видаленні проекту: ' + err.message, 'error');
+      showNotification("Помилка при видаленні проекту: " + err.message, "error");
     }
   };
 
   const handleDeleteSubmissionClick = async (submissionId) => {
-    if (!window.confirm('Ви впевнені, що хочете видалити цю заявку?')) return;
+    if (!window.confirm("Ви впевнені, що хочете видалити цю заявку?")) return;
     try {
       await deleteSubmission(submissionId);
       loadSubmissions();
-      showNotification('Заявку видалено!', 'success');
+      showNotification("Заявку видалено!", "success");
     } catch (err) {
-      showNotification('Помилка при видаленні заявки: ' + err.message, 'error');
+      showNotification("Помилка при видаленні заявки: " + err.message, "error");
     }
   };
 
@@ -163,7 +164,9 @@ export const AdminPanel = () => {
                 required
               />
             </div>
-            <button type="submit" className="btn btn-primary w-full mt-6">Увійти</button>
+            <button type="submit" className="btn btn-primary w-full mt-6">
+              Увійти
+            </button>
           </form>
         </div>
       </div>
@@ -173,24 +176,59 @@ export const AdminPanel = () => {
   return (
     <div className="min-h-screen bg-gray-100 relative">
       {/* Notifications */}
-      <div className="fixed bottom-4 right-4 space-y-2 z-50">
-        {notifications.map((n) => (
-          <div
-            key={n.id}
-            className={`transition-transform transform duration-300 px-4 py-2 rounded shadow text-white ${
-              n.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-            }`}
-          >
-            {n.message}
-          </div>
-        ))}
+      <div className="fixed bottom-4 right-4 space-y-3 z-50">
+        <AnimatePresence>
+          {notifications.map((n) => (
+            <motion.div
+              key={n.id}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+              className={`relative flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-white w-80 overflow-hidden
+                ${n.type === "success" ? "bg-green-600" : ""}
+                ${n.type === "error" ? "bg-red-600" : ""}
+                ${n.type === "info" ? "bg-blue-600" : ""}`}
+            >
+              {/* Icon */}
+              <div className="flex-shrink-0">
+                {n.type === "success" && <CheckCircle size={24} />}
+                {n.type === "error" && <XCircle size={24} />}
+                {n.type === "info" && <Info size={24} />}
+              </div>
+
+              {/* Text */}
+              <div className="flex-1 text-sm font-medium">{n.message}</div>
+
+              {/* Close button */}
+              <button
+                onClick={() =>
+                  setNotifications((prev) => prev.filter((x) => x.id !== n.id))
+                }
+                className="absolute top-2 right-2 text-white/70 hover:text-white"
+              >
+                <X size={16} />
+              </button>
+
+              {/* Progress bar */}
+              <motion.div
+                initial={{ width: "100%" }}
+                animate={{ width: "0%" }}
+                transition={{ duration: n.duration / 1000, ease: "linear" }}
+                className="absolute bottom-0 left-0 h-1 bg-white/50"
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
 
       <div className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center h-16">
             <h1 className="text-xl font-bold text-gray-900">Адмін Панель</h1>
-            <button onClick={handleLogout} className="btn btn-outline">Вийти</button>
+            <button onClick={handleLogout} className="btn btn-outline">
+              Вийти
+            </button>
           </div>
         </div>
       </div>
@@ -203,32 +241,48 @@ export const AdminPanel = () => {
               <ul className="space-y-2">
                 <li>
                   <button
-                    onClick={() => setActiveTab('dashboard')}
-                    className={`w-full text-left p-3 rounded-lg transition-colors ${activeTab === 'dashboard' ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}`}
+                    onClick={() => setActiveTab("dashboard")}
+                    className={`w-full text-left p-3 rounded-lg transition-colors ${
+                      activeTab === "dashboard"
+                        ? "bg-blue-600 text-white"
+                        : "hover:bg-gray-100"
+                    }`}
                   >
                     <BarChart3 className="inline mr-2" size={20} /> Dashboard
                   </button>
                 </li>
                 <li>
                   <button
-                    onClick={() => setActiveTab('gallery')}
-                    className={`w-full text-left p-3 rounded-lg transition-colors ${activeTab === 'gallery' ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}`}
+                    onClick={() => setActiveTab("gallery")}
+                    className={`w-full text-left p-3 rounded-lg transition-colors ${
+                      activeTab === "gallery"
+                        ? "bg-blue-600 text-white"
+                        : "hover:bg-gray-100"
+                    }`}
                   >
                     <Eye className="inline mr-2" size={20} /> Управління галереєю
                   </button>
                 </li>
                 <li>
                   <button
-                    onClick={() => setActiveTab('submissions')}
-                    className={`w-full text-left p-3 rounded-lg transition-colors ${activeTab === 'submissions' ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}`}
+                    onClick={() => setActiveTab("submissions")}
+                    className={`w-full text-left p-3 rounded-lg transition-colors ${
+                      activeTab === "submissions"
+                        ? "bg-blue-600 text-white"
+                        : "hover:bg-gray-100"
+                    }`}
                   >
                     <Mail className="inline mr-2" size={20} /> Заявки
                   </button>
                 </li>
                 <li>
                   <button
-                    onClick={() => setActiveTab('changePassword')}
-                    className={`w-full text-left p-3 rounded-lg transition-colors ${activeTab === 'changePassword' ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}`}
+                    onClick={() => setActiveTab("changePassword")}
+                    className={`w-full text-left p-3 rounded-lg transition-colors ${
+                      activeTab === "changePassword"
+                        ? "bg-blue-600 text-white"
+                        : "hover:bg-gray-100"
+                    }`}
                   >
                     <Lock className="inline mr-2" size={20} /> Змінити пароль
                   </button>
@@ -239,15 +293,15 @@ export const AdminPanel = () => {
 
           {/* Main Content */}
           <div className="lg:w-3/4">
-            {activeTab === 'dashboard' && (
+            {activeTab === "dashboard" && (
               <DashboardTab projects={projects} submissions={submissions} />
             )}
 
-            {activeTab === 'gallery' && (
+            {activeTab === "gallery" && (
               <GalleryTab showNotification={showNotification} />
             )}
 
-            {activeTab === 'submissions' && (
+            {activeTab === "submissions" && (
               <SubmissionsTab
                 submissions={submissions}
                 handleDeleteSubmissionClick={handleDeleteSubmissionClick}
@@ -255,7 +309,7 @@ export const AdminPanel = () => {
               />
             )}
 
-            {activeTab === 'changePassword' && (
+            {activeTab === "changePassword" && (
               <ChangePasswordTab showNotification={showNotification} />
             )}
           </div>
