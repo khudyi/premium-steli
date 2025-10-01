@@ -38,6 +38,7 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
     if (!formData.title.trim()) newErrors.title = "Назва обов'язкова";
     if (!formData.description.trim()) newErrors.description = "Опис обов'язковий";
     if (!formData.date) newErrors.date = "Дата обов'язкова";
+    if (!formData.image_url || !formData.image_url.trim()) newErrors.image_url = "Головне фото обов'язкове";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -62,6 +63,9 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
     }
   };
 
+  // кнопка Save активна тільки якщо статус idle і є головне фото
+  const isSaveDisabled = status !== "idle" || !formData.image_url?.trim();
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-auto" ref={modalRef}>
       <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6 relative">
@@ -74,6 +78,7 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Назва */}
           <div>
             <label className="form-label">Назва</label>
             <input
@@ -85,6 +90,7 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
             {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
           </div>
 
+          {/* Категорія */}
           <div>
             <label className="form-label">Категорія</label>
             <select
@@ -99,6 +105,7 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
             </select>
           </div>
 
+          {/* Опис */}
           <div>
             <label className="form-label">Опис</label>
             <textarea
@@ -109,6 +116,7 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
             {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
           </div>
 
+          {/* Дата */}
           <div>
             <label className="form-label">Дата</label>
             <input
@@ -120,6 +128,7 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
             {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
           </div>
 
+          {/* Головне фото */}
           <ImageUploader
             label="Головне фото"
             files={formData.image_url || ""}
@@ -127,7 +136,9 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
             isMain
             showNotification={showNotification}
           />
+          {errors.image_url && <p className="text-red-500 text-sm mt-1">{errors.image_url}</p>}
 
+          {/* Додаткові фото */}
           <ImageUploader
             label="Додаткові фото"
             files={Array.isArray(formData.images) ? formData.images : []}
@@ -135,9 +146,15 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
             showNotification={showNotification}
           />
 
+          {/* Кнопки */}
           <div className="flex justify-end gap-3">
             <button type="button" onClick={onClose} className="btn btn-secondary">Скасувати</button>
-            <button type="submit" className="btn btn-primary" disabled={status !== "idle"} title={status !== "idle" ? "Будь ласка, зачекайте..." : ""}>
+            <button
+              type="submit"
+              className={`btn btn-primary ${isSaveDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+              disabled={isSaveDisabled}
+              title={isSaveDisabled ? "Будь ласка, завантажте головне фото" : ""}
+            >
               {status === "saving" ? "Зберігаємо..." : "Зберегти"}
             </button>
           </div>
