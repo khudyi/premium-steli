@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { getProjects, addProject, updateProject, deleteProject } from "../lib/projects";
 import { Trash2, Plus, Calendar, Search, ArrowUpDown } from "lucide-react";
-
 import { ProjectForm } from "./ProjectForm";
 
 export const GalleryTab = ({ showNotification, openConfirmModal }) => {
@@ -67,9 +66,8 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
   const handleUndo = async () => {
     if (!undoProject) return;
     try {
-      // attempt to re-create project (may need adjustments depending on your API)
       const projectToRestore = { ...undoProject };
-      delete projectToRestore.id; // ensure new id is created
+      delete projectToRestore.id;
       await addProject(projectToRestore);
       showNotification("Проєкт відновлено!", "success");
       setUndoProject(null);
@@ -79,7 +77,6 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
     }
   };
 
-  // Фільтрація і сортування
   const filteredProjects = (projects || [])
     .filter((p) => (p.title || "").toLowerCase().includes(search.toLowerCase()))
     .sort((a, b) => {
@@ -101,14 +98,12 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
               className="form-input pl-8 w-full"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              aria-label="Пошук проєктів"
             />
           </div>
           <button
             onClick={() => setSort(sort === "date-desc" ? "date-asc" : "date-desc")}
             className="btn btn-secondary flex items-center gap-2 whitespace-nowrap"
             aria-pressed={sort === "date-asc"}
-            title="Перемкнути сортування за датою"
           >
             <ArrowUpDown size={16} />
             Сортувати
@@ -119,7 +114,7 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
                 title: "",
                 description: "",
                 category: "MSD Classic",
-                date: "",
+                date: new Date().toISOString().split("T")[0],
                 image_url: "",
                 images: [],
               })
@@ -131,7 +126,6 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
         </div>
       </div>
 
-      {/* Undo */}
       {undoProject && (
         <div className="bg-yellow-100 p-3 rounded flex justify-between items-center">
           <span>Видалено "{undoProject.title}".</span>
@@ -146,7 +140,6 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
         </div>
       )}
 
-      {/* Список проєктів */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {loading
           ? Array.from({ length: 6 }).map((_, i) => (
@@ -203,7 +196,6 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
             ))}
       </div>
 
-      {/* Модальне вікно редагування */}
       {editingProject && (
         <ProjectForm
           project={editingProject}
