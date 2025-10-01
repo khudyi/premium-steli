@@ -1,19 +1,19 @@
 import { useState, useEffect, useRef } from "react";
-import { uploadImage } from "../lib/storage";
+import { ImageUploader } from "./ImageUploader";
 import { X } from "lucide-react";
 
-export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
-  const defaultProject = {
-    title: "",
-    description: "",
-    category: "MSD Classic",
-    date: new Date().toISOString().split("T")[0],
-    image_url: "",
-    images: [],
-  };
+const defaultProject = {
+  title: "",
+  description: "",
+  category: "MSD Classic",
+  date: new Date().toISOString().split("T")[0],
+  image_url: "",
+  images: [],
+};
 
+export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
   const [formData, setFormData] = useState({ ...defaultProject, ...(project || {}) });
-  const [status, setStatus] = useState("idle"); // idle | saving | uploading
+  const [status, setStatus] = useState("idle"); // idle | saving
   const [errors, setErrors] = useState({});
   const modalRef = useRef(null);
 
@@ -22,11 +22,8 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
     setErrors({});
   }, [project]);
 
-  // Close on Escape
   useEffect(() => {
-    const handleKey = (e) => {
-      if (e.key === "Escape") onClose();
-    };
+    const handleKey = (e) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [onClose]);
@@ -34,31 +31,6 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
   const handleChange = (field) => (e) => {
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
-  };
-
-  const handleFileUpload = async (fileList, isMain = false) => {
-    const files = Array.isArray(fileList) ? fileList : Array.from(fileList || []);
-    if (!files.length) return;
-
-    setStatus("uploading");
-    try {
-      const urls = await Promise.all(files.map((f) => uploadImage(f)));
-      if (isMain) {
-        setFormData((prev) => ({ ...prev, image_url: urls[0] }));
-        showNotification("Головне фото завантажене!", "success");
-      } else {
-        setFormData((prev) => ({ ...prev, images: [...(prev.images || []), ...urls] }));
-        showNotification("Додаткові фото завантажені!", "success");
-      }
-    } catch (err) {
-      showNotification("Помилка при завантаженні фото: " + err.message, "error");
-    } finally {
-      setStatus("idle");
-    }
-  };
-
-  const handleRemoveExtra = (idx) => {
-    setFormData((prev) => ({ ...prev, images: prev.images.filter((_, i) => i !== idx) }));
   };
 
   const validate = () => {
@@ -76,15 +48,12 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
 
     setStatus("saving");
     try {
-      // Надсилаємо лише URL фото, без File обʼєктів
       const projectToSave = {
         ...formData,
-        image_url: formData.image_url,
-        images: formData.images || [],
+        image_url: formData.image_url || "",
+        images: Array.isArray(formData.images) ? formData.images : [],
       };
-
       await onSave(projectToSave);
-
       setFormData({ ...defaultProject });
     } catch (err) {
       showNotification("Помилка при збереженні: " + (err?.message || err), "error");
@@ -93,25 +62,10 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
     }
   };
 
-  const handleDrop = (e, isMain = false) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const files = e.dataTransfer.files;
-    handleFileUpload(files, isMain);
-  };
-  const handleDragOver = (e) => e.preventDefault();
-
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-auto"
-      ref={modalRef}
-    >
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-auto" ref={modalRef}>
       <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6 relative">
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-          aria-label="Закрити"
-        >
+        <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700" aria-label="Закрити">
           <X size={20} />
         </button>
 
@@ -120,7 +74,6 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Назва */}
           <div>
             <label className="form-label">Назва</label>
             <input
@@ -132,7 +85,6 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
             {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
           </div>
 
-          {/* Категорія */}
           <div>
             <label className="form-label">Категорія</label>
             <select
@@ -147,7 +99,6 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
             </select>
           </div>
 
-          {/* Опис */}
           <div>
             <label className="form-label">Опис</label>
             <textarea
@@ -155,12 +106,9 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
               value={formData.description}
               onChange={handleChange("description")}
             />
-            {errors.description && (
-              <p className="text-red-500 text-sm mt-1">{errors.description}</p>
-            )}
+            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
           </div>
 
-          {/* Дата */}
           <div>
             <label className="form-label">Дата</label>
             <input
@@ -172,78 +120,25 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
             {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
           </div>
 
-          {/* Головне фото */}
-          <div>
-            <label className="form-label">Головне фото</label>
-            <div
-              className="border-dashed border-2 border-gray-300 p-4 rounded text-center cursor-pointer mb-2"
-              onDrop={(e) => handleDrop(e, true)}
-              onDragOver={handleDragOver}
-            >
-              {formData.image_url ? (
-                <img
-                  src={formData.image_url}
-                  alt="preview"
-                  className="h-32 mx-auto rounded object-cover mb-2"
-                />
-              ) : (
-                <p>Перетягніть фото сюди або оберіть файл</p>
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                className="form-input w-full mt-2"
-                onChange={(e) => handleFileUpload(e.target.files, true)}
-              />
-            </div>
-          </div>
+          <ImageUploader
+            label="Головне фото"
+            files={formData.image_url || ""}
+            setFiles={(url) => setFormData((prev) => ({ ...prev, image_url: url || "" }))}
+            isMain
+            showNotification={showNotification}
+          />
 
-          {/* Додаткові фото */}
-          <div>
-            <label className="form-label">Додаткові фото</label>
-            <div
-              className="border-dashed border-2 border-gray-300 p-4 rounded mb-2 flex flex-wrap gap-2"
-              onDrop={(e) => handleDrop(e, false)}
-              onDragOver={handleDragOver}
-            >
-              {formData.images?.map((img, i) => (
-                <div key={i} className="relative">
-                  <img
-                    src={img}
-                    alt={`extra-${i}`}
-                    className="h-24 w-24 object-cover rounded"
-                  />
-                  <button
-                    type="button"
-                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full px-1"
-                    onClick={() => handleRemoveExtra(i)}
-                    aria-label={`Видалити фото ${i + 1}`}
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              ))}
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                className="form-input w-full mt-2"
-                onChange={(e) => handleFileUpload(e.target.files, false)}
-              />
-            </div>
-          </div>
+          <ImageUploader
+            label="Додаткові фото"
+            files={Array.isArray(formData.images) ? formData.images : []}
+            setFiles={(imgs) => setFormData((prev) => ({ ...prev, images: Array.isArray(imgs) ? imgs : [] }))}
+            showNotification={showNotification}
+          />
 
-          {/* Кнопки */}
           <div className="flex justify-end gap-3">
-            <button type="button" onClick={onClose} className="btn btn-secondary">
-              Скасувати
-            </button>
-            <button type="submit" className="btn btn-primary" disabled={status !== "idle"}>
-              {status === "saving"
-                ? "Зберігаємо..."
-                : status === "uploading"
-                ? "Завантажую фото..."
-                : "Зберегти"}
+            <button type="button" onClick={onClose} className="btn btn-secondary">Скасувати</button>
+            <button type="submit" className="btn btn-primary" disabled={status !== "idle"} title={status !== "idle" ? "Будь ласка, зачекайте..." : ""}>
+              {status === "saving" ? "Зберігаємо..." : "Зберегти"}
             </button>
           </div>
         </form>
