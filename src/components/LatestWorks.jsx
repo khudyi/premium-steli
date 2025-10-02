@@ -8,7 +8,7 @@ export const LatestWorks = () => {
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-  const [direction, setDirection] = useState(1);
+  const [direction, setDirection] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const modalRef = useRef(null);
@@ -31,7 +31,7 @@ export const LatestWorks = () => {
     loadProjects();
   }, []);
 
-  // Закриття по Esc + навігація по стрілках
+  // Esc + стрілки
   useEffect(() => {
     const handleKeys = (e) => {
       if (e.key === 'Escape') closeProject();
@@ -42,7 +42,7 @@ export const LatestWorks = () => {
     return () => window.removeEventListener('keydown', handleKeys);
   }, [selectedProject, currentPhotoIndex]);
 
-  // Блокування скролу при відкритті модалки
+  // Блокування скролу при модалці
   useEffect(() => {
     document.body.style.overflow = selectedProject ? 'hidden' : '';
     if (selectedProject && modalRef.current) {
@@ -56,13 +56,13 @@ export const LatestWorks = () => {
   const openProject = (project) => {
     setSelectedProject(project);
     setCurrentPhotoIndex(0);
-    setDirection(1);
+    setDirection(0);
   };
 
   const closeProject = () => {
     setSelectedProject(null);
     setCurrentPhotoIndex(0);
-    setDirection(1);
+    setDirection(0);
   };
 
   const photos = selectedProject
@@ -79,11 +79,34 @@ export const LatestWorks = () => {
     setCurrentPhotoIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
   };
 
-  // Анімація для фото в слайдері
+  // Плавна анімація для фото
   const variants = {
-    enter: (dir) => ({ x: dir > 0 ? 300 : -300, opacity: 0 }),
-    center: { x: 0, opacity: 1 },
-    exit: (dir) => ({ x: dir > 0 ? -300 : 300, opacity: 0 }),
+    enter: (dir) => ({
+      x: dir > 0 ? 300 : -300,
+      opacity: 0,
+      scale: 0.95
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      transition: {
+        x: { type: 'spring', stiffness: 280, damping: 30 },
+        opacity: { duration: 0.3 },
+        scale: { duration: 0.3 }
+      }
+    },
+    exit: (dir) => ({
+      zIndex: 0,
+      x: dir > 0 ? -300 : 300,
+      opacity: 0,
+      scale: 0.95,
+      transition: {
+        x: { type: 'spring', stiffness: 280, damping: 30 },
+        opacity: { duration: 0.2 }
+      }
+    })
   };
 
   return (
@@ -96,7 +119,7 @@ export const LatestWorks = () => {
           </p>
         </div>
 
-        {/* Loading & Error states */}
+        {/* Loading & Error */}
         {loading && <p className="text-center text-gray-500">Завантаження...</p>}
         {error && <p className="text-center text-red-500">{error}</p>}
 
@@ -139,10 +162,7 @@ export const LatestWorks = () => {
         )}
 
         <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6">
-          <Link
-            to="/gallery"
-            className="btn btn-primary inline-flex items-center text-lg"
-          >
+          <Link to="/gallery" className="btn btn-primary inline-flex items-center text-lg">
             Переглянути всі проєкти
             <ArrowRight className="ml-2" size={20} />
           </Link>
@@ -173,7 +193,7 @@ export const LatestWorks = () => {
             aria-label={`Перегляд проєкту ${selectedProject.title}`}
           >
             <div
-              className="bg-white rounded-lg shadow-lg max-w-4xl w-full max-h-full overflow-hidden relative"
+              className="bg-white rounded-lg shadow-lg max-w-5xl w-full max-h-full overflow-hidden relative flex flex-col"
               onClick={(e) => e.stopPropagation()}
               tabIndex={-1}
               ref={modalRef}
@@ -186,8 +206,8 @@ export const LatestWorks = () => {
                 <X size={24} />
               </button>
 
-              <div className="relative w-full h-96 overflow-hidden flex items-center justify-center">
-                <AnimatePresence custom={direction} initial={false}>
+              <div className="relative w-full h-[70vh] flex items-center justify-center bg-black">
+                <AnimatePresence custom={direction} initial={false} mode="wait">
                   <motion.img
                     key={currentPhotoIndex}
                     src={photos[currentPhotoIndex]}
@@ -198,8 +218,17 @@ export const LatestWorks = () => {
                     initial="enter"
                     animate="center"
                     exit="exit"
-                    transition={{ duration: 0.5 }}
-                    className="absolute w-full h-96 object-cover"
+                    drag="x"
+                    dragConstraints={{ left: 0, right: 0 }}
+                    dragElastic={0.7}
+                    onDragEnd={(e, { offset, velocity }) => {
+                      const swipe = Math.abs(offset.x) > 100 || Math.abs(velocity.x) > 500;
+                      if (swipe) {
+                        if (offset.x < 0) nextPhoto();
+                        else prevPhoto();
+                      }
+                    }}
+                    className="max-h-full max-w-full object-contain m-auto rounded"
                   />
                 </AnimatePresence>
 
@@ -207,14 +236,14 @@ export const LatestWorks = () => {
                   <>
                     <button
                       onClick={prevPhoto}
-                      className="absolute top-1/2 left-2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full hover:bg-black/50 transition-colors"
+                      className="absolute top-1/2 left-2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
                       aria-label="Попереднє фото"
                     >
                       <ChevronLeft size={24} />
                     </button>
                     <button
                       onClick={nextPhoto}
-                      className="absolute top-1/2 right-2 -translate-y-1/2 bg-black/30 text-white p-2 rounded-full hover:bg-black/50 transition-colors"
+                      className="absolute top-1/2 right-2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
                       aria-label="Наступне фото"
                     >
                       <ChevronRight size={24} />
@@ -222,12 +251,20 @@ export const LatestWorks = () => {
                   </>
                 )}
 
-                <div className="absolute bottom-2 right-2 bg-black/50 text-white text-sm px-3 py-1 rounded-full">
+                {/* Лічильник */}
+                <motion.div
+                  key={currentPhotoIndex}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="absolute bottom-2 right-2 bg-black/60 text-white text-sm px-3 py-1 rounded-full"
+                >
                   {currentPhotoIndex + 1} / {photos.length}
-                </div>
+                </motion.div>
               </div>
 
-              <div className="p-6">
+              <div className="p-6 overflow-y-auto">
                 <div className="flex justify-between items-center mb-4">
                   <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full capitalize">
                     {selectedProject.category}
