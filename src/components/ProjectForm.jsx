@@ -56,7 +56,6 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
       };
       await onSave(projectToSave);
 
-      // Скидаємо тільки якщо це новий проєкт
       if (!formData.id) {
         setFormData({ ...defaultProject });
       }
@@ -67,20 +66,29 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
     }
   };
 
-  // кнопка Save активна тільки якщо статус idle і є головне фото
   const isSaveDisabled = status !== "idle" || !formData.image_url?.trim();
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-auto" ref={modalRef}>
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6 relative">
-        <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700" aria-label="Закрити">
-          <X size={20} />
-        </button>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-4 sm:p-6 relative max-h-[90vh] overflow-y-auto"
+      >
+        {/* Header */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg sm:text-xl font-bold">
+            {formData.id ? "Редагувати проєкт" : "Новий проєкт"}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+            aria-label="Закрити"
+          >
+            <X size={24} />
+          </button>
+        </div>
 
-        <h2 className="text-xl font-bold mb-4">
-          {formData.id ? "Редагувати проєкт" : "Новий проєкт"}
-        </h2>
-
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Назва */}
           <div>
@@ -155,9 +163,11 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
             showNotification={showNotification}
           />
 
-          {/* Кнопки */}
-          <div className="flex justify-end gap-3">
-            <button type="button" onClick={onClose} className="btn btn-secondary">Скасувати</button>
+          {/* Buttons */}
+          <div className="sticky bottom-0 bg-white pt-3 flex justify-end gap-3 border-t mt-4">
+            <button type="button" onClick={onClose} className="btn btn-secondary">
+              Скасувати
+            </button>
             <button
               type="submit"
               className={`btn btn-primary ${isSaveDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
