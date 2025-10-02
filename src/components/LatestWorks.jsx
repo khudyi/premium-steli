@@ -45,9 +45,7 @@ export const LatestWorks = () => {
   // Блокування скролу при модалці
   useEffect(() => {
     document.body.style.overflow = selectedProject ? 'hidden' : '';
-    if (selectedProject && modalRef.current) {
-      modalRef.current.focus();
-    }
+    if (selectedProject && modalRef.current) modalRef.current.focus();
     return () => {
       document.body.style.overflow = '';
     };
@@ -79,33 +77,22 @@ export const LatestWorks = () => {
     setCurrentPhotoIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
   };
 
-  // Плавна анімація для фото
+  // Анімація фото
   const variants = {
-    enter: (dir) => ({
-      x: dir > 0 ? 300 : -300,
-      opacity: 0,
-      scale: 0.95
-    }),
+    enter: (dir) => ({ x: dir > 0 ? 300 : -300, opacity: 0, scale: 0.95 }),
     center: {
       zIndex: 1,
       x: 0,
       opacity: 1,
       scale: 1,
-      transition: {
-        x: { type: 'spring', stiffness: 280, damping: 30 },
-        opacity: { duration: 0.3 },
-        scale: { duration: 0.3 }
-      }
+      transition: { x: { type: 'spring', stiffness: 280, damping: 30 }, opacity: { duration: 0.3 }, scale: { duration: 0.3 } }
     },
     exit: (dir) => ({
       zIndex: 0,
       x: dir > 0 ? -300 : 300,
       opacity: 0,
       scale: 0.95,
-      transition: {
-        x: { type: 'spring', stiffness: 280, damping: 30 },
-        opacity: { duration: 0.2 }
-      }
+      transition: { x: { type: 'spring', stiffness: 280, damping: 30 }, opacity: { duration: 0.2 } }
     })
   };
 
@@ -207,6 +194,7 @@ export const LatestWorks = () => {
               </button>
 
               <div className="relative w-full h-[70vh] flex items-center justify-center bg-black">
+                {/* Фото */}
                 <AnimatePresence custom={direction} initial={false} mode="wait">
                   <motion.img
                     key={currentPhotoIndex}
@@ -223,45 +211,34 @@ export const LatestWorks = () => {
                     dragElastic={0.7}
                     onDragEnd={(e, { offset, velocity }) => {
                       const swipe = Math.abs(offset.x) > 100 || Math.abs(velocity.x) > 500;
-                      if (swipe) {
-                        if (offset.x < 0) nextPhoto();
-                        else prevPhoto();
-                      }
+                      if (swipe) offset.x < 0 ? nextPhoto() : prevPhoto();
                     }}
                     className="max-h-full max-w-full object-contain m-auto rounded"
                   />
                 </AnimatePresence>
 
+                {/* Кнопки та лічильник завжди поза AnimatePresence */}
                 {photos.length > 1 && (
                   <>
                     <button
                       onClick={prevPhoto}
-                      className="absolute top-1/2 left-2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                      className="absolute top-1/2 left-2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full hover:bg-black/70 transition-colors z-50"
                       aria-label="Попереднє фото"
                     >
                       <ChevronLeft size={24} />
                     </button>
                     <button
                       onClick={nextPhoto}
-                      className="absolute top-1/2 right-2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                      className="absolute top-1/2 right-2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full hover:bg-black/70 transition-colors z-50"
                       aria-label="Наступне фото"
                     >
                       <ChevronRight size={24} />
                     </button>
+                    <div className="absolute bottom-2 right-2 bg-black/60 text-white text-sm px-3 py-1 rounded-full z-50">
+                      {currentPhotoIndex + 1} / {photos.length}
+                    </div>
                   </>
                 )}
-
-                {/* Лічильник */}
-                <motion.div
-                  key={currentPhotoIndex}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                  className="absolute bottom-2 right-2 bg-black/60 text-white text-sm px-3 py-1 rounded-full"
-                >
-                  {currentPhotoIndex + 1} / {photos.length}
-                </motion.div>
               </div>
 
               <div className="p-6 overflow-y-auto">
