@@ -16,12 +16,11 @@ export const ImageUploader = ({ label, files, setFiles, isMain = false, showNoti
         setFiles(urls[0] || "");
         showNotification("Головне фото завантажене!", "success");
       } else {
-        // Завжди гарантуємо, що files масив
         setFiles((prev) => [...(Array.isArray(prev) ? prev : []), ...urls]);
         showNotification("Додаткові фото завантажені!", "success");
       }
     } catch (err) {
-      showNotification("Помилка при завантаженні фото: " + err.message, "error");
+      showNotification("Помилка при завантаженні фото: " + (err.message || err), "error");
     }
   };
 
@@ -39,8 +38,11 @@ export const ImageUploader = ({ label, files, setFiles, isMain = false, showNoti
   const handleDragLeave = () => setDragOver(false);
 
   const handleRemove = (idx) => {
-    if (isMain) setFiles("");
-    else setFiles((prev) => (Array.isArray(prev) ? prev.filter((_, i) => i !== idx) : []));
+    if (isMain) {
+      setFiles("");
+    } else {
+      setFiles((prev) => (Array.isArray(prev) ? prev.filter((_, i) => i !== idx) : []));
+    }
   };
 
   return (
@@ -56,7 +58,17 @@ export const ImageUploader = ({ label, files, setFiles, isMain = false, showNoti
       >
         {/* Головне фото */}
         {isMain && typeof files === "string" && files ? (
-          <img src={files} alt="preview" className="h-32 mx-auto rounded object-cover mb-2" />
+          <div className="relative inline-block">
+            <img src={files} alt="preview" className="h-32 mx-auto rounded object-cover mb-2" />
+            <button
+              type="button"
+              className="absolute top-0 right-0 bg-red-500 text-white rounded-full px-1"
+              onClick={() => handleRemove(0)}
+              aria-label="Видалити головне фото"
+            >
+              <X size={14} />
+            </button>
+          </div>
         ) : 
         /* Додаткові фото */
         !isMain && Array.isArray(files) && files.length ? (

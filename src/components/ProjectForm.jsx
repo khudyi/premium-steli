@@ -38,7 +38,7 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
     if (!formData.title.trim()) newErrors.title = "Назва обов'язкова";
     if (!formData.description.trim()) newErrors.description = "Опис обов'язковий";
     if (!formData.date) newErrors.date = "Дата обов'язкова";
-    if (!formData.image_url || !formData.image_url.trim()) newErrors.image_url = "Головне фото обов'язкове";
+    if (!formData.image_url?.trim()) newErrors.image_url = "Головне фото обов'язкове";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -55,7 +55,11 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
         images: Array.isArray(formData.images) ? formData.images : [],
       };
       await onSave(projectToSave);
-      setFormData({ ...defaultProject });
+
+      // Скидаємо тільки якщо це новий проєкт
+      if (!formData.id) {
+        setFormData({ ...defaultProject });
+      }
     } catch (err) {
       showNotification("Помилка при збереженні: " + (err?.message || err), "error");
     } finally {
@@ -142,7 +146,12 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
           <ImageUploader
             label="Додаткові фото"
             files={Array.isArray(formData.images) ? formData.images : []}
-            setFiles={(imgs) => setFormData((prev) => ({ ...prev, images: Array.isArray(imgs) ? imgs : [] }))}
+            setFiles={(updater) =>
+              setFormData((prev) => ({
+                ...prev,
+                images: typeof updater === "function" ? updater(prev.images) : updater,
+              }))
+            }
             showNotification={showNotification}
           />
 
