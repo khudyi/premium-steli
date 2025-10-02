@@ -15,6 +15,18 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
     loadProjects();
   }, []);
 
+  // Блокування скролу фону під час відкритої модалки
+  useEffect(() => {
+    if (editingProject) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [editingProject]);
+
   const loadProjects = async () => {
     try {
       const data = await getProjects();

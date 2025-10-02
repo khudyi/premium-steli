@@ -13,7 +13,7 @@ const defaultProject = {
 
 export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
   const [formData, setFormData] = useState({ ...defaultProject, ...(project || {}) });
-  const [status, setStatus] = useState("idle"); // idle | saving
+  const [status, setStatus] = useState("idle");
   const [errors, setErrors] = useState({});
   const modalRef = useRef(null);
 
@@ -69,7 +69,7 @@ export const ProjectForm = ({ project, onClose, onSave, showNotification }) => {
   const isSaveDisabled = status !== "idle" || !formData.image_url?.trim();
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-black/50 p-4 overflow-auto">
       <div
         ref={modalRef}
         className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-4 sm:p-6 relative max-h-[90vh] overflow-y-auto"
