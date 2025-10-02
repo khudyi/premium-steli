@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { uploadImage } from "../lib/storage";
-import { X } from "lucide-react";
+import { X, Upload } from "lucide-react";
 
 export const ImageUploader = ({ label, files, setFiles, isMain = false, showNotification }) => {
   const [dragOver, setDragOver] = useState(false);
@@ -49,20 +49,20 @@ export const ImageUploader = ({ label, files, setFiles, isMain = false, showNoti
     <div>
       <label className="form-label">{label}</label>
       <div
-        className={`border-dashed border-2 p-4 rounded mb-2 text-center cursor-pointer ${
-          dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300"
+        className={`border-dashed border-2 p-6 rounded-lg mb-2 text-center transition-colors ${
+          dragOver ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-blue-400"
         }`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
       >
-        {/* Головне фото */}
+        {/* Превʼю */}
         {isMain && typeof files === "string" && files ? (
           <div className="relative inline-block">
-            <img src={files} alt="preview" className="h-32 mx-auto rounded object-cover mb-2" />
+            <img src={files} alt="preview" className="h-32 mx-auto rounded-lg object-cover mb-2 shadow" />
             <button
               type="button"
-              className="absolute top-0 right-0 bg-red-500 text-white rounded-full px-1"
+              className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
               onClick={() => handleRemove(0)}
               aria-label="Видалити головне фото"
             >
@@ -70,15 +70,14 @@ export const ImageUploader = ({ label, files, setFiles, isMain = false, showNoti
             </button>
           </div>
         ) : 
-        /* Додаткові фото */
         !isMain && Array.isArray(files) && files.length ? (
-          <div className="flex flex-wrap gap-2 mb-2">
+          <div className="flex flex-wrap gap-3 justify-center mb-2">
             {files.map((img, i) => (
-              <div key={i} className="relative">
-                <img src={img} alt={`extra-${i}`} className="h-24 w-24 object-cover rounded" />
+              <div key={i} className="relative group">
+                <img src={img} alt={`extra-${i}`} className="h-24 w-24 object-cover rounded-lg shadow" />
                 <button
                   type="button"
-                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full px-1"
+                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-80 hover:opacity-100"
                   onClick={() => handleRemove(i)}
                   aria-label={`Видалити фото ${i + 1}`}
                 >
@@ -88,16 +87,31 @@ export const ImageUploader = ({ label, files, setFiles, isMain = false, showNoti
             ))}
           </div>
         ) : (
-          <p>Перетягніть фото сюди або оберіть файл</p>
+          <div className="text-gray-500 text-sm flex flex-col items-center gap-2">
+            <Upload size={32} className="text-blue-500" />
+            <p>Перетягніть фото сюди або оберіть файл</p>
+          </div>
         )}
 
-        <input
-          type="file"
-          accept="image/*"
-          multiple={!isMain}
-          className="form-input w-full mt-2"
-          onChange={(e) => handleUpload(e.target.files)}
-        />
+        {/* Красива кнопка */}
+        <div className="mt-3 flex justify-center">
+          <button
+            type="button"
+            onClick={() => document.getElementById(`file-input-${isMain ? "main" : "extra"}`).click()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition-colors flex items-center gap-2"
+          >
+            <Upload size={16} />
+            Обрати файл
+          </button>
+          <input
+            id={`file-input-${isMain ? "main" : "extra"}`}
+            type="file"
+            accept="image/*"
+            multiple={!isMain}
+            className="hidden"
+            onChange={(e) => handleUpload(e.target.files)}
+          />
+        </div>
       </div>
     </div>
   );
