@@ -86,28 +86,35 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
     });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between gap-4 items-center">
-        <h2 className="text-2xl font-bold">Галерея</h2>
-        <div className="flex gap-2 items-center w-full md:w-auto">
-          <div className="relative flex-1 md:flex-none">
+    <div className="space-y-6 px-2 sm:px-4">
+      {/* Заголовок + дії */}
+      <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 items-stretch sm:items-center">
+        <h2 className="text-xl sm:text-2xl font-bold">Галерея</h2>
+        
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          {/* Пошук */}
+          <div className="relative flex-1 sm:flex-none">
             <Search className="absolute left-2 top-2.5 text-gray-400" size={16} />
             <input
               type="text"
               placeholder="Пошук..."
-              className="form-input pl-8 w-full"
+              className="form-input pl-8 w-full text-sm sm:text-base"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
+
+          {/* Сортування */}
           <button
             onClick={() => setSort(sort === "date-desc" ? "date-asc" : "date-desc")}
-            className="btn btn-secondary flex items-center gap-2 whitespace-nowrap"
+            className="btn btn-secondary flex items-center gap-2 text-sm sm:text-base"
             aria-pressed={sort === "date-asc"}
           >
             <ArrowUpDown size={16} />
-            Сортувати
+            <span className="hidden sm:inline">Сортувати</span>
           </button>
+
+          {/* Додати */}
           <button
             onClick={() =>
               setEditingProject({
@@ -119,16 +126,17 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
                 images: [],
               })
             }
-            className="btn btn-primary flex items-center gap-2"
+            className="btn btn-primary flex items-center gap-2 text-sm sm:text-base"
           >
-            <Plus size={20} /> Додати проєкт
+            <Plus size={18} /> <span>Додати</span>
           </button>
         </div>
       </div>
 
+      {/* Undo */}
       {undoProject && (
-        <div className="bg-yellow-100 p-3 rounded flex justify-between items-center">
-          <span>Видалено "{undoProject.title}".</span>
+        <div className="bg-yellow-100 p-3 rounded flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <span className="text-sm sm:text-base">Видалено "{undoProject.title}".</span>
           <div className="flex gap-2">
             <button onClick={handleUndo} className="btn btn-secondary btn-sm">
               Відновити
@@ -140,10 +148,11 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Сітка проєктів */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
         {loading
           ? Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-gray-200 animate-pulse h-60 rounded-xl" />
+              <div key={i} className="bg-gray-200 animate-pulse h-40 sm:h-48 md:h-52 xl:h-56 rounded-xl" />
             ))
           : filteredProjects.map((project) => (
               <div
@@ -154,11 +163,11 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
                   <img
                     src={project.image_url}
                     alt={project.title}
-                    className="w-full h-52 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-105"
+                    className="w-full h-40 sm:h-48 md:h-52 xl:h-56 object-cover rounded-t-xl transition-transform duration-300 group-hover:scale-105"
                     loading="lazy"
                   />
                   <div
-                    className={`absolute top-3 left-3 text-xs px-2 py-1 rounded-full ${
+                    className={`absolute top-3 left-3 text-xs md:text-sm px-2 py-1 rounded-full ${
                       project.category === "MSD Premium"
                         ? "bg-purple-100 text-purple-800"
                         : project.category === "Bauf & Renolit"
@@ -168,34 +177,35 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
                   >
                     {project.category}
                   </div>
-                  <div className="absolute top-3 right-3 bg-white/70 px-2 py-1 rounded text-gray-700 text-xs flex items-center gap-1">
+                  <div className="absolute top-3 right-3 bg-white/70 px-2 py-1 rounded text-gray-700 text-xs md:text-sm flex items-center gap-1">
                     <Calendar size={12} /> {project.date ? new Date(project.date).toLocaleDateString() : ""}
                   </div>
                 </div>
 
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-1">{project.title}</h3>
-                  <p className="text-gray-600 text-sm line-clamp-3">{project.description}</p>
+                <div className="p-3 sm:p-4 md:p-5">
+                  <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-1">{project.title}</h3>
+                  <p className="text-gray-600 text-sm md:text-base line-clamp-3">{project.description}</p>
                 </div>
 
-                <div className="flex justify-end gap-2 p-4 pt-0">
+                <div className="flex justify-end gap-2 p-3 sm:p-4 md:p-5 pt-0">
                   <button
                     onClick={() => setEditingProject(project)}
-                    className="px-3 py-1 text-sm rounded bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
+                    className="px-3 py-1 text-xs sm:text-sm md:text-base rounded bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
                   >
                     Редагувати
                   </button>
                   <button
                     onClick={() => handleDelete(project.id)}
-                    className="px-3 py-1 text-sm rounded bg-red-100 text-red-700 hover:bg-red-200 transition flex items-center gap-1"
+                    className="px-3 py-1 text-xs sm:text-sm md:text-base rounded bg-red-100 text-red-700 hover:bg-red-200 transition flex items-center gap-1"
                   >
-                    <Trash2 size={16} /> Видалити
+                    <Trash2 size={14} /> Видалити
                   </button>
                 </div>
               </div>
             ))}
       </div>
 
+      {/* Форма редагування */}
       {editingProject && (
         <ProjectForm
           project={editingProject}
