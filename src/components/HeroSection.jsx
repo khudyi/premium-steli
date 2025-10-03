@@ -133,7 +133,7 @@ export const HeroSection = () => {
           >
             <Users className="text-yellow-400" size={32} />
             <div className="text-2xl font-bold mt-1">
-              <AnimatedNumber value={500} />+
+              <AnimatedNumber value={4000} />+
             </div>
             <div className="text-blue-200 text-sm">Проєктів</div>
           </motion.div>

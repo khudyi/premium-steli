@@ -106,7 +106,7 @@ export const Contacts = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
                 { icon: <Award className="text-white" size={32} />, title: '15+ Років Досвіду', text: 'Понад пʼятнадцять років професійного досвіду встановлення натяжних стель з тисячами задоволених клієнтів.' },
-                { icon: <Users className="text-white" size={32} />, title: '500+ Проєктів', text: 'Успішно виконані установки — від невеликих житлових кімнат до великих комерційних приміщень' },
+                { icon: <Users className="text-white" size={32} />, title: '4000+ Проєктів', text: 'Успішно виконані установки — від невеликих житлових кімнат до великих комерційних приміщень' },
                 { icon: <Star className="text-white fill-current" size={32} />, title: 'Рейтинг 4,9/5', text: 'Послідовно визнані найкращим підрядником з встановлення натяжних стель у регіоні з чудовими відгуками клієнтів' },
               ].map((item, i) => (
                 <motion.div key={i} {...fadeUp} transition={{ duration: 0.7, delay: i * 0.2 }} className="text-center">
