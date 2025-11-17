@@ -6,7 +6,7 @@ export default function ServicesCalculator({ isOpen, onClose, defaultService, on
     const [service, setService] = useState(defaultService || "");
     const [width, setWidth] = useState("");
     const [length, setLength] = useState("");
-    const [lights, setLights] = useState(0);
+    const [lights, setLights] = useState('');
     const [decor, setDecor] = useState(false);
 
     // 1 — Пре-заповнення service
@@ -176,7 +176,6 @@ export default function ServicesCalculator({ isOpen, onClose, defaultService, on
                                 {calcResult} грн
                             </motion.p>
                         </div>
-
                         {/* 4 — Детальний розрахунок */}
                         {calcResult > 0 && (
                             <div className="mt-4 p-4 bg-gray-50 rounded-lg text-sm text-gray-800">
@@ -184,7 +183,10 @@ export default function ServicesCalculator({ isOpen, onClose, defaultService, on
                                 <p>Площа: {area.toFixed(2)} м² × {selectedService.price} грн ={" "}
                                     <strong>{(area * selectedService.price).toFixed(0)} грн</strong>
                                 </p>
-                                <p>Світильники: {lights} × 300 = <strong>{lights * 300} грн</strong></p>
+                                <p>
+                                    Світильники:{' '}
+                                    {lights === '' ? '—' : <span>{lights} × 300 = <strong>{lights * 300} грн</strong></span>}
+                                </p>
                                 <p>Декор: {decor ? `${perimeter.toFixed(2)}м × 40 = ${(
                                     perimeter * 40
                                 ).toFixed(0)} грн` : "—"}</p>
