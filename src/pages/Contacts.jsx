@@ -25,7 +25,7 @@ export const Contacts = () => {
         <div className="container mx-auto px-4">
           <motion.div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
             {[
-              { icon: <Phone className="text-blue-600" size={32} />, title: 'Зателефонуйте нам', description: 'Спілкуйтеся безпосередньо з нашими експертами для оперативної допомоги.', contacts: ['tel:+380979526777','tel:+380509526773','tel:+380739526773'], note: 'Пн-Пт: 08:00-16:00' },
+              { icon: <Phone className="text-blue-600" size={32} />, title: 'Зателефонуйте нам', description: 'Спілкуйтеся безпосередньо з нашими експертами для оперативної допомоги.', contacts: ['tel:+38 097 95 26 777','tel:+38 05 09 526 773','tel:+38 073 95 26 773'], note: 'Пн-Пт: 08:00-16:00' },
               { icon: <Mail className="text-blue-600" size={32} />, title: 'Напишіть нам', description: 'Надішліть нам деталі вашого проєкту, і ми відповімо протягом 24 годин', contacts: ['mailto:info@premiumsteli.com'], note: 'Ми відповідаємо цілодобово' },
               { icon: <MapPin className="text-blue-600" size={32} />, title: 'Де ми працюємо?', description: 'Працюємо по Вінниці та її околицях', contacts: [], note: 'Тільки за попереднім записом' }
             ].map((card, i) => (
