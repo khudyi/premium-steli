@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { Phone, Mail, MapPin, Send } from 'lucide-react';
+import { Phone, MapPin, Send } from 'lucide-react';
 import { addSubmission } from '../lib/submissions';
 
 export const ContactForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    email: '',
     projectDetails: ''
   });
   const [errors, setErrors] = useState({});
@@ -30,14 +29,6 @@ export const ContactForm = () => {
     } else if (!/^\+?[\d\s-()]+$/.test(formData.phone)) {
       newErrors.phone = 'Будь ласка, введіть дійсний номер телефону';
     }
-
-    // Email не обов'язковий
-    if (formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Будь ласка, введіть дійсну електронну адресу';
-    }
-
-    if (!formData.projectDetails.trim()) newErrors.projectDetails = 'Деталі проєкту обов’язкові';
-
     return newErrors;
   };
 
@@ -55,12 +46,14 @@ export const ContactForm = () => {
     try {
       const submissionData = {
         ...formData,
-        email: formData.email.trim() ? formData.email : 'Клієнт не надав електронної адреси'
+        projectDetails: formData.projectDetails.trim() 
+          ? formData.projectDetails 
+          : 'Клієнт не надав деталей проєкту'
       };
 
       await addSubmission(submissionData);
       setSubmitted(true);
-      setFormData({ name: '', phone: '', email: '', projectDetails: '' });
+      setFormData({ name: '', phone: '', projectDetails: '' });
     } catch (err) {
       alert('Сталася помилка при надсиланні заявки: ' + err.message);
     } finally {
@@ -125,17 +118,6 @@ export const ContactForm = () => {
                   <p className="text-sm text-gray-500">Пн-Сб: 08:00-18:00</p>
                 </div>
               </div>
-              
-              <div className="flex items-start space-x-4">
-                <div className="bg-blue-100 p-3 rounded-lg">
-                  <Mail className="text-blue-600" size={24} />
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-1">Електронна адреса</h4>
-                  <p className="text-gray-600">info@premiumsteli.com</p>
-                  <p className="text-sm text-gray-500">Відповідь протягом 24 годин</p>
-                </div>
-              </div>
 
               <div className="flex items-start space-x-4">
                 <div className="bg-blue-100 p-3 rounded-lg">
@@ -160,7 +142,6 @@ export const ContactForm = () => {
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
 
@@ -198,29 +179,15 @@ export const ContactForm = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Електронна адреса</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="form-input"
-                  placeholder="your.email@example.com (не обовʼязково)"
-                />
-                {errors.email && <div className="form-error">{errors.email}</div>}
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Деталі проєкту *</label>
+                <label className="form-label">Деталі проєкту</label>
                 <textarea
                   name="projectDetails"
                   value={formData.projectDetails}
                   onChange={handleChange}
                   rows="4"
                   className="form-input"
-                  placeholder="Розкажіть нам про свій проєкт"
+                  placeholder="Розкажіть нам про свій проєкт (не обов’язково)"
                 />
-                {errors.projectDetails && <div className="form-error">{errors.projectDetails}</div>}
               </div>
 
               <button 
