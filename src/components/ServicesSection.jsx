@@ -155,6 +155,7 @@ export const ServicesSection = () => {
         isOpen={isCalculatorOpen}
         onClose={() => setIsCalculatorOpen(false)}
         defaultService={selectedService}
+        onRequestQuote={() => setIsModalOpen(true)}
       />
 
       {/* Modal */}

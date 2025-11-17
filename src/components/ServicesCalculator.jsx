@@ -1,24 +1,25 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
-export default function ServicesCalculator({ isOpen, onClose, defaultService }) {
+export default function ServicesCalculator({ isOpen, onClose, defaultService, onRequestQuote }) {
   const [service, setService] = useState(defaultService || "");
   const [width, setWidth] = useState("");
   const [length, setLength] = useState("");
   const [lights, setLights] = useState(0);
   const [decor, setDecor] = useState(false);
 
+  // 1 — Пре-заповнення service
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
+    if (isOpen && defaultService) {
+      setService(defaultService);
     }
+  }, [isOpen, defaultService]);
 
-    return () => {
-      document.body.style.overflow = "";
-    };
+  // Блокування скролу
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => (document.body.style.overflow = "");
   }, [isOpen]);
 
   const services = [
@@ -27,19 +28,31 @@ export default function ServicesCalculator({ isOpen, onClose, defaultService }) 
     { name: "Bauf та Renolit", price: 450 },
   ];
 
-  const calcResult = () => {
-    if (!width || !length || !service) return 0;
+  // 7 — Площа та периметр
+  const area = useMemo(() => {
+    if (!width || !length) return 0;
+    return Number(width) * Number(length);
+  }, [width, length]);
 
-    const selected = services.find((s) => s.name === service);
-    const area = Number(width) * Number(length);
-    const perimeter = (Number(width) + Number(length)) * 2;
+  const perimeter = useMemo(() => {
+    if (!width || !length) return 0;
+    return (Number(width) + Number(length)) * 2;
+  }, [width, length]);
 
-    const baseCost = area * selected.price;
+  const selectedService = useMemo(
+    () => services.find((s) => s.name === service),
+    [service]
+  );
+
+  const calcResult = useMemo(() => {
+    if (!area || !selectedService) return 0;
+
+    const baseCost = area * selectedService.price;
     const lightsCost = lights * 300;
     const decorCost = decor ? perimeter * 40 : 0;
 
     return baseCost + lightsCost + decorCost;
-  };
+  }, [area, lights, decor, perimeter, selectedService]);
 
   return (
     <AnimatePresence>
@@ -74,7 +87,7 @@ export default function ServicesCalculator({ isOpen, onClose, defaultService }) 
               Тип послуги
             </label>
             <select
-              className="form-input w-full mb-4"
+              className={`form-input w-full mb-4 ${!service ? "border-red-500" : ""}`}
               value={service}
               onChange={(e) => setService(e.target.value)}
             >
@@ -92,7 +105,10 @@ export default function ServicesCalculator({ isOpen, onClose, defaultService }) 
             </label>
             <input
               type="number"
-              className="form-input w-full mb-4"
+              min="1"
+              step="0.1"
+              placeholder="Наприклад: 4.2"
+              className={`form-input w-full mb-4 ${!width ? "border-red-500" : ""}`}
               value={width}
               onChange={(e) => setWidth(e.target.value)}
             />
@@ -103,7 +119,10 @@ export default function ServicesCalculator({ isOpen, onClose, defaultService }) 
             </label>
             <input
               type="number"
-              className="form-input w-full mb-4"
+              min="1"
+              step="0.1"
+              placeholder="Наприклад: 3.5"
+              className={`form-input w-full mb-4 ${!length ? "border-red-500" : ""}`}
               value={length}
               onChange={(e) => setLength(e.target.value)}
             />
@@ -114,6 +133,8 @@ export default function ServicesCalculator({ isOpen, onClose, defaultService }) 
             </label>
             <input
               type="number"
+              min="0"
+              placeholder="0, якщо не потрібно"
               className="form-input w-full mb-4"
               value={lights}
               onChange={(e) => setLights(Number(e.target.value))}
@@ -131,15 +152,55 @@ export default function ServicesCalculator({ isOpen, onClose, defaultService }) 
               </span>
             </div>
 
+            {/* Live area + perimeter info */}
+            {(area > 0 || perimeter > 0) && (
+              <div className="mb-4 text-gray-700 text-sm">
+                <p>Площа: <span className="font-semibold">{area.toFixed(2)} м²</span></p>
+                <p>Периметр: <span className="font-semibold">{perimeter.toFixed(2)} м</span></p>
+              </div>
+            )}
+
             {/* Result */}
             <div className="text-center mt-6 p-4 bg-blue-50 rounded-lg">
               <p className="text-lg font-semibold text-gray-900">
                 Орієнтовна вартість:
               </p>
-              <p className="text-3xl font-bold text-blue-600 mt-2">
-                {calcResult()} грн
-              </p>
+
+              <motion.p
+                key={calcResult}
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
+                className="text-3xl font-bold text-blue-600 mt-2"
+              >
+                {calcResult} грн
+              </motion.p>
             </div>
+
+            {/* 4 — Детальний розрахунок */}
+            {calcResult > 0 && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg text-sm text-gray-800">
+                <p><strong>Деталізація:</strong></p>
+                <p>Площа: {area.toFixed(2)} м² × {selectedService.price} грн ={" "}
+                  <strong>{(area * selectedService.price).toFixed(0)} грн</strong>
+                </p>
+                <p>Світильники: {lights} × 300 = <strong>{lights * 300} грн</strong></p>
+                <p>Декор: {decor ? `${perimeter.toFixed(2)}м × 40 = ${(
+                  perimeter * 40
+                ).toFixed(0)} грн` : "—"}</p>
+              </div>
+            )}
+
+            {/* 5 — Request quote */}
+            <button
+              className="btn btn-primary w-full mt-6"
+              onClick={() => {
+                onClose();
+                onRequestQuote && onRequestQuote();
+              }}
+            >
+              Отримати точний прорахунок
+            </button>
           </motion.div>
         </motion.div>
       )}
