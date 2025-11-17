@@ -187,9 +187,14 @@ export default function ServicesCalculator({ isOpen, onClose, defaultService, on
                                     Світильники:{' '}
                                     {lights === '' ? '—' : <span>{lights} × 300 = <strong>{lights * 300} грн</strong></span>}
                                 </p>
-                                <p>Декор: {decor ? `${perimeter.toFixed(2)}м × 40 = ${(
-                                    perimeter * 40
-                                ).toFixed(0)} грн` : "—"}</p>
+                                <p>
+                                    Декор:{" "}
+                                    {decor ? (
+                                        <>
+                                            {`${perimeter.toFixed(2)}м × 40 = `}<strong>{(perimeter * 40).toFixed(0)} грн</strong>
+                                        </>
+                                    ) : "—"}
+                                </p>
                             </div>
                         )}
 
