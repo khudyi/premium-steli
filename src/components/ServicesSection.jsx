@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, Layers, Star, Sparkles, Info, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { addSubmission } from "../lib/submissions";
@@ -12,7 +12,6 @@ export const ServicesSection = () => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
-    email: "",
     projectDetails: "",
   });
 
@@ -24,6 +23,12 @@ export const ServicesSection = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // 🟦 Block scroll when consultation modal is open
+  useEffect(() => {
+    document.body.style.overflow = isModalOpen ? "hidden" : "";
+    return () => (document.body.style.overflow = "");
+  }, [isModalOpen]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -32,7 +37,7 @@ export const ServicesSection = () => {
     try {
       await addSubmission(formData);
       setSuccess(true);
-      setFormData({ name: "", phone: "", email: "", projectDetails: "" });
+      setFormData({ name: "", phone: "", projectDetails: "" });
 
       setTimeout(() => {
         setIsModalOpen(false);
@@ -158,7 +163,7 @@ export const ServicesSection = () => {
         onRequestQuote={() => setIsModalOpen(true)}
       />
 
-      {/* Modal */}
+      {/* Consultation Modal */}
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
@@ -186,6 +191,7 @@ export const ServicesSection = () => {
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Отримати консультацію</h3>
 
               <form onSubmit={handleSubmit} className="space-y-4">
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Ім’я</label>
                   <input
@@ -209,18 +215,6 @@ export const ServicesSection = () => {
                     className="form-input w-full"
                     placeholder="+380..."
                     required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="form-input w-full"
-                    placeholder="example@gmail.com"
                   />
                 </div>
 
