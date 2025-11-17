@@ -3,7 +3,7 @@ import { Phone, Mail, MapPin, Send } from 'lucide-react';
 import { addSubmission } from '../lib/submissions';
 
 export const ContactForm = () => {
-   const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     name: '',
     phone: '',
     email: '',
@@ -24,7 +24,6 @@ export const ContactForm = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
     if (!formData.name.trim()) newErrors.name = 'Ім’я обов’язкове';
     if (!formData.phone.trim()) {
       newErrors.phone = 'Номер телефону обов’язковий';
@@ -131,16 +130,30 @@ export const ContactForm = () => {
                   <p className="text-sm text-gray-500">Відповідь протягом 24 годин</p>
                 </div>
               </div>
-              
               <div className="flex items-start space-x-4">
                 <div className="bg-blue-100 p-3 rounded-lg">
                   <MapPin className="text-blue-600" size={24} />
                 </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-1">Територія обслуговування</h4>
-                  <p className="text-gray-600">Вінниця та область</p>
+                <div className="flex-1">
+                  <h4 className="font-bold text-gray-900 mb-1">Де ми знаходимось?</h4>
+                  <p className="text-gray-600">м. Вінниця</p>
+                  <p className="text-sm text-gray-500">вул. Київська, 29</p>
+                  <div className="w-full h-64 rounded-lg overflow-hidden border border-gray-200">
+                    <iframe
+                      title="Мапа нашого офісу"
+                      width="100%"
+                      height="100%"
+                      frameBorder="0"
+                      scrolling="no"
+                      marginHeight="0"
+                      marginWidth="0"
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d20840.980746517784!2d28.431116726214924!3d49.23616486868022!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40df853225ccaeaf%3A0x1b8d46905c148fbf!2z0J3QsNGC0Y_QttC90ZYg0KHRgtC10LvRliBQcmVtaXVtc3RlbGk!5e0!3m2!1sru!2sua!4v1763391058710!5m2!1sru!2sua"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
                 </div>
               </div>
+
             </div>
           </div>
 
