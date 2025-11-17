@@ -30,11 +30,12 @@ export const ContactForm = () => {
     } else if (!/^\+?[\d\s-()]+$/.test(formData.phone)) {
       newErrors.phone = 'Будь ласка, введіть дійсний номер телефону';
     }
-    if (!formData.email.trim()) {
-      newErrors.email = 'Електронна пошта обов’язкова';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+
+    // Email не обов'язковий
+    if (formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Будь ласка, введіть дійсну електронну адресу';
     }
+
     if (!formData.projectDetails.trim()) newErrors.projectDetails = 'Деталі проєкту обов’язкові';
 
     return newErrors;
@@ -52,7 +53,12 @@ export const ContactForm = () => {
     setIsSubmitting(true);
 
     try {
-      await addSubmission(formData);
+      const submissionData = {
+        ...formData,
+        email: formData.email.trim() ? formData.email : 'Клієнт не надав електронної адреси'
+      };
+
+      await addSubmission(submissionData);
       setSubmitted(true);
       setFormData({ name: '', phone: '', email: '', projectDetails: '' });
     } catch (err) {
@@ -130,6 +136,7 @@ export const ContactForm = () => {
                   <p className="text-sm text-gray-500">Відповідь протягом 24 годин</p>
                 </div>
               </div>
+
               <div className="flex items-start space-x-4">
                 <div className="bg-blue-100 p-3 rounded-lg">
                   <MapPin className="text-blue-600" size={24} />
@@ -191,14 +198,14 @@ export const ContactForm = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Електронна адреса *</label>
+                <label className="form-label">Електронна адреса</label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
                   className="form-input"
-                  placeholder="your.email@example.com"
+                  placeholder="your.email@example.com (не обовʼязково)"
                 />
                 {errors.email && <div className="form-error">{errors.email}</div>}
               </div>
