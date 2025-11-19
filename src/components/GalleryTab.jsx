@@ -30,10 +30,8 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
     } finally {
       if (mounted) setLoading(false);
     }
-    return () => {
-      mounted = false;
-    };
-  }, [showNotification]);
+    return () => (mounted = false);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -49,7 +47,7 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
       }
     })();
     return () => { cancelled = true; };
-  }, [showNotification]);
+  }, []);
 
   useEffect(() => {
     const id = setTimeout(() => setDebouncedSearch(search), 300);
@@ -81,80 +79,75 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
     return filteredProjects.slice(start, start + PAGE_SIZE);
   }, [filteredProjects, page]);
 
-  const handleSave = useCallback(
-    async (project) => {
-      setLoading(true);
-      try {
-        if (project.id) {
-          await updateProject(project.id, project);
-          showNotification("Проєкт оновлено!", "success");
-        } else {
-          await addProject(project);
-          showNotification("Проєкт додано!", "success");
-        }
-        setEditingProject(null);
-        // reload
-        const data = await getProjects();
-        setProjects(data || []);
-      } catch (err) {
-        showNotification("Помилка при збереженні проєкту: " + (err?.message || err), "error");
-      } finally {
-        setLoading(false);
+  const handleSave = async (project) => {
+    setLoading(true);
+    try {
+      if (project.id) {
+        await updateProject(project.id, project);
+        showNotification("Проєкт оновлено!", "success");
+      } else {
+        await addProject(project);
+        showNotification("Проєкт додано!", "success");
       }
-    },
-    [showNotification]
-  );
+      setEditingProject(null);
 
-  const handleDelete = useCallback(
-    (id) => {
-      const project = projects.find((p) => p.id === id);
-      openConfirmModal({
-        title: "Видалити проєкт?",
-        message: "Ви впевнені, що хочете видалити цей проєкт?",
-        onConfirm: async (closeModal) => {
-          try {
-            setDeletingId(id);
-            await deleteProject(id);
-            setUndoProject(project || null);
+      const data = await getProjects();
+      setProjects(data || []);
+    } catch (err) {
+      showNotification("Помилка при збереженні проєкту: " + (err?.message || err), "error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            const data = await getProjects();
-            setProjects(data || []);
+  const handleDelete = (id) => {
+    const project = projects.find((p) => p.id === id);
+    openConfirmModal({
+      title: "Видалити проєкт?",
+      message: "Ви впевнені, що хочете видалити цей проєкт?",
+      onConfirm: async (closeModal) => {
+        try {
+          setDeletingId(id);
+          await deleteProject(id);
+          setUndoProject(project || null);
 
-            showNotification("Проєкт видалено! Можна відновити.", "success");
-            closeModal();
+          const data = await getProjects();
+          setProjects(data || []);
 
-            if (undoTimerId) clearTimeout(undoTimerId);
-            const t = setTimeout(() => setUndoProject(null), 6000);
-            setUndoTimerId(t);
-          } catch (err) {
-            showNotification("Помилка при видаленні проєкту: " + (err?.message || err), "error");
-          } finally {
-            setDeletingId(null);
-          }
-        },
-      });
-    },
-    [openConfirmModal, projects, showNotification, undoTimerId]
-  );
+          showNotification("Проєкт видалено! Можна відновити.", "success");
+          closeModal();
 
-  const handleUndo = useCallback(async () => {
+          if (undoTimerId) clearTimeout(undoTimerId);
+          const t = setTimeout(() => setUndoProject(null), 6000);
+          setUndoTimerId(t);
+        } catch (err) {
+          showNotification("Помилка при видаленні проєкту: " + (err?.message || err), "error");
+        } finally {
+          setDeletingId(null);
+        }
+      },
+    });
+  };
+
+  const handleUndo = async () => {
     if (!undoProject) return;
     try {
-      const projectToRestore = { ...undoProject };
-      delete projectToRestore.id; // create new
-      await addProject(projectToRestore);
+      const restored = { ...undoProject };
+      delete restored.id;
+
+      await addProject(restored);
       showNotification("Проєкт відновлено!", "success");
+
       setUndoProject(null);
-      if (undoTimerId) {
-        clearTimeout(undoTimerId);
-        setUndoTimerId(null);
-      }
+      if (undoTimerId) clearTimeout(undoTimerId);
+      setUndoTimerId(null);
+
       const data = await getProjects();
       setProjects(data || []);
     } catch (err) {
       showNotification("Не вдалося відновити проєкт", "error");
     }
-  }, [undoProject, showNotification, undoTimerId]);
+  };
 
   useEffect(() => {
     return () => {
@@ -273,13 +266,12 @@ export const GalleryTab = ({ showNotification, openConfirmModal }) => {
                       loading="lazy"
                     />
                     <div
-                      className={`absolute top-3 left-3 text-xs md:text-sm px-2 py-1 rounded-full ${
-                        project.category === "MSD Premium"
+                      className={`absolute top-3 left-3 text-xs md:text-sm px-2 py-1 rounded-full ${project.category === "MSD Premium"
                           ? "bg-purple-100 text-purple-800"
                           : project.category === "Bauf & Renolit"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-blue-100 text-blue-800"
-                      }`}
+                            ? "bg-green-100 text-green-800"
+                            : "bg-blue-100 text-blue-800"
+                        }`}
                     >
                       {project.category}
                     </div>
