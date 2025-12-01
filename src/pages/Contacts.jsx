@@ -26,7 +26,7 @@ export const Contacts = () => {
           <motion.div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
             {[
               { icon: <Phone className="text-blue-600" size={32} />, title: 'Зателефонуйте нам', description: 'Спілкуйтеся безпосередньо з нашими експертами для оперативної допомоги.', contacts: ['tel:+38 097 95 26 777','tel:+38 05 09 526 773','tel:+38 073 95 26 773'], note: 'Пн-Пт: 08:00-16:00' },
-              { icon: <Mail className="text-blue-600" size={32} />, title: 'Напишіть нам', description: 'Надішліть нам деталі вашого проєкту, і ми відповімо протягом 24 годин', contacts: ['mailto:info@premiumsteli.com'], note: 'Ми відповідаємо цілодобово' },
+              { icon: <Mail className="text-blue-600" size={32} />, title: 'Напишіть нам', description: 'Надішліть нам деталі вашого проєкту, і ми відповімо протягом 24 годин', contacts: ['mailto:stelipremium@gmail.com'], note: 'Ми відповідаємо цілодобово' },
               { icon: <MapPin className="text-blue-600" size={32} />, title: 'Де ми працюємо?', description: 'Працюємо по Вінниці та її околицях', contacts: [], note: 'Тільки за попереднім записом' }
             ].map((card, i) => (
               <motion.div key={i} {...fadeUp} transition={{ duration: 0.7, delay: i * 0.2 }} className="card p-8 text-center">
